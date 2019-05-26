@@ -56,6 +56,27 @@ int run_command(char *path, char **av)
 	return (1);
 }
 
+int run_builtins(char *line)
+{
+	int n;
+
+	n = -1;
+	while (ft_strchr(" 	", line[++n]))
+		;
+	if (!ft_strncmp("env", &line[n], 3))
+	{
+		ft_print_tables(environ);
+		return (0);	
+	}
+	if (!ft_strncmp("exit", &line[n], 4))
+	{
+		free(line);
+		exit(1);
+		return (0);	
+	}
+	return (1);
+}
+
 int run_non_builtin(char *line)
 {
 	char *command;
@@ -67,7 +88,7 @@ int run_non_builtin(char *line)
 		;
 	line = &line[n];
 	command = get_one_arg(line);
-	av = get_av(line); 
+	av = get_av(line);
 	if (!access(command, X_OK | F_OK))
 		run_command(command, av);
 	n = -1;
@@ -88,9 +109,10 @@ int main(void)
 	shell_init(shell);
 	while (1)
 	{
-		write(1, "$> ", 3);
+		write(1, "Super shell: ", 13);
 		get_next_line(0, &line);
-		run_non_builtin(line);
+		if (run_builtins(line))
+			run_non_builtin(line);
 		free(line);
 	}
 	return (0);
