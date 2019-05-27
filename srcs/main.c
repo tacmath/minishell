@@ -56,6 +56,52 @@ int run_command(char *path, char **av)
 	return (1);
 }
 
+void ft_cd(char *line)
+{
+	char **av;
+	int n;
+
+	n = -1;
+	while (ft_strchr(" 	", line[++n]))
+		;
+	av = get_av(&line[n]);
+	if (!av[1])
+	{
+		ft_super_free(2, av[0], av);
+		return ;
+	}
+	if (av[2])
+	{
+		ft_putstr("cd: string not in pwd: ");
+		ft_putendl(av[1]);
+		n = -1;
+		while (av[++n])
+			free(av[n]);
+		free(av);
+		return ;
+	}
+	if (access(av[1], F_OK))
+	{
+		ft_putstr("cd: no such file or directory: ");
+		ft_putendl(av[1]);
+		ft_super_free(3, av[0], av[1], av);
+		return ;
+	}
+	if (access(av[1], R_OK))
+	{
+		ft_putstr("cd: permission denied: ");
+		ft_putendl(av[1]);
+		ft_super_free(3, av[0], av[1], av);
+		return ;
+	}
+	if (chdir(av[1]))
+	{
+		ft_putstr("cd: not a directory: ");
+		ft_putendl(av[1]);
+	}
+	ft_super_free(3, av[0], av[1], av);
+}
+
 int run_builtins(char *line)
 {
 	int n;
@@ -72,15 +118,64 @@ int run_builtins(char *line)
 	{
 		free(line);
 		exit(1);
-		return (0);	
+		return (0);
+	}
+	if (!ft_strncmp("cd", &line[n], 2))
+	{
+		ft_cd(line);	
+		return (0);
 	}
 	return (1);
+}
+
+char **get_all_path(void)
+{
+	int n;
+	int m;
+	int i;
+	char **tmp;
+	char *path;
+
+	n = -1;
+	while (environ[++n])
+		if (!ft_strncmp("PATH=", environ[n], 5))
+			path = &environ[n][5];
+	n = -1;
+	m = 2;
+	while (path[++n])
+		if (path[n] == ':')
+			m++;
+	if (!(tmp = ft_memalloc(sizeof(char*) * m)))
+		return (0);
+
+	m = 0;
+	i = 0;
+	while (path[n + ++m] != ':' && path[n + m])
+		;
+	if (!(tmp[i] = ft_memalloc(sizeof(char) * (m + 1))))
+		return (0);
+	ft_strncpy(tmp[i++], &path[n], m);
+	n = -1;
+	while (path[++n])
+		if (path[n] == ':')
+		{
+			n++;
+			m = 0;
+			while (path[n + ++m] != ':' && path[n + m])
+				;
+			if (!(tmp[i] = ft_memalloc(sizeof(char) * (m + 1))))
+				return (0);
+			ft_strncpy(tmp[i++], &path[n], m);
+		}
+	return (tmp);
 }
 
 int run_non_builtin(char *line)
 {
 	char *command;
 	char **av;
+	char **path;
+	char *tmp;
 	int n;
 
 	n = -1;
@@ -91,6 +186,25 @@ int run_non_builtin(char *line)
 	av = get_av(line);
 	if (!access(command, X_OK | F_OK))
 		run_command(command, av);
+	else
+	{
+		path = get_all_path();
+		n = -1;
+		while (path[++n])
+		{
+			tmp = ft_super_join(3, path[n], "/", command);
+			if (!access(tmp, X_OK | F_OK))
+			{
+				run_command(tmp, av);
+				break ;
+			}
+			free(tmp);
+		}
+		n = -1;
+		while (path[++n])
+			free(path[n]);
+		free(path);
+	}
 	n = -1;
 	while (av[++n])
 		free(av[n]);
