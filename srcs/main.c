@@ -50,7 +50,8 @@ int run_command(char *path, char **av)
 
 	father = fork();
 	if (father == 0)
-		execve(path, av, 0);
+		if (execve(path, av, 0) == -1)
+			ft_putendl("command failed");
 	if (father > 0)
 		wait(NULL);
 	return (1);
@@ -137,9 +138,16 @@ char **get_all_path(void)
 	char *path;
 
 	n = -1;
+	path = 0;
 	while (environ[++n])
 		if (!ft_strncmp("PATH=", environ[n], 5))
 			path = &environ[n][5];
+	if (!path)
+	{
+		if (!(tmp = ft_memalloc(sizeof(char*))))
+			return (0);
+		return (tmp);
+	}
 	n = -1;
 	m = 2;
 	while (path[++n])
@@ -199,6 +207,11 @@ int run_non_builtin(char *line)
 				break ;
 			}
 			free(tmp);
+		}
+		if (!path[n])
+		{
+			ft_putstr("minishell: command not found: ");
+			ft_putendl(command);
 		}
 		n = -1;
 		while (path[++n])
