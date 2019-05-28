@@ -2,7 +2,17 @@
 
 int shell_init(t_shell *shell)
 {
+	int n;
+
 	shell->home = ft_strdup(&(environ[5][5]));
+	n = -1;
+	while (environ[++n])
+		;
+	if (!(shell->shell_env = ft_memalloc(sizeof(char*) * ++n)))
+		return (0);
+	n = -1;
+	while (environ[++n])
+		shell->shell_env[n] = ft_strdup(environ[n]);
 	return (1);
 }
 
@@ -44,13 +54,13 @@ char **get_av(char *line)
 	return (tmp);
 }
 
-int run_command(char *path, char **av)
+int run_command(char *path, char **av, t_shell *shell)
 {
 	pid_t	father;
 
 	father = fork();
 	if (father == 0)
-		if (execve(path, av, 0) == -1)
+		if (execve(path, av, shell->shell_env) == -1)
 			ft_putendl("command failed");
 	if (father > 0)
 		wait(NULL);
@@ -103,7 +113,7 @@ void ft_cd(char *line)
 	ft_super_free(3, av[0], av[1], av);
 }
 
-int run_builtins(char *line)
+int run_builtins(char *line, t_shell *shell)
 {
 	int n;
 
@@ -112,11 +122,16 @@ int run_builtins(char *line)
 		;
 	if (!ft_strncmp("env", &line[n], 3))
 	{
-		ft_print_tables(environ);
+		ft_print_tables(shell->shell_env);
 		return (0);	
 	}
 	if (!ft_strncmp("exit", &line[n], 4))
 	{
+		n = -1;
+		while (shell->shell_env[++n])
+			free(shell->shell_env[n]);
+		free(shell->shell_env);
+		free(shell->home);
 		free(line);
 		exit(1);
 		return (0);
@@ -129,7 +144,7 @@ int run_builtins(char *line)
 	return (1);
 }
 
-char **get_all_path(void)
+char **get_all_path(char **env)
 {
 	int n;
 	int m;
@@ -139,9 +154,9 @@ char **get_all_path(void)
 
 	n = -1;
 	path = 0;
-	while (environ[++n])
-		if (!ft_strncmp("PATH=", environ[n], 5))
-			path = &environ[n][5];
+	while (env[++n])
+		if (!ft_strncmp("PATH=", env[n], 5))
+			path = &env[n][5];
 	if (!path)
 	{
 		if (!(tmp = ft_memalloc(sizeof(char*))))
@@ -178,7 +193,7 @@ char **get_all_path(void)
 	return (tmp);
 }
 
-int run_non_builtin(char *line)
+int run_non_builtin(char *line, t_shell *shell)
 {
 	char *command;
 	char **av;
@@ -193,17 +208,17 @@ int run_non_builtin(char *line)
 	command = get_one_arg(line);
 	av = get_av(line);
 	if (!access(command, X_OK | F_OK))
-		run_command(command, av);
+		run_command(command, av, shell);
 	else
 	{
-		path = get_all_path();
+		path = get_all_path(shell->shell_env);
 		n = -1;
 		while (path[++n])
 		{
 			tmp = ft_super_join(3, path[n], "/", command);
 			if (!access(tmp, X_OK | F_OK))
 			{
-				run_command(tmp, av);
+				run_command(tmp, av, shell);
 				break ;
 			}
 			free(tmp);
@@ -238,8 +253,8 @@ int main(void)
 	{
 		write(1, "Super shell: ", 13);
 		get_next_line(0, &line);
-		if (run_builtins(line))
-			run_non_builtin(line);
+		if (run_builtins(line, shell))
+			run_non_builtin(line, shell);
 		free(line);
 	}
 	return (0);

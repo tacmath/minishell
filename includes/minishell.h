@@ -11,9 +11,8 @@ extern char **environ;
 
 struct s_shell
 {
-	char **builtin_name;
-	int  *(*builtin)(void*);
 	char *home;
+	char **shell_env;
 };
 
 typedef struct s_shell t_shell;
