@@ -67,78 +67,153 @@ int run_command(char *path, char **av, t_shell *shell)
 	return (1);
 }
 
-void ft_cd(char *line)
+int ft_cd(char **av)
 {
-	char **av;
-	int n;
-
-	n = -1;
-	while (ft_strchr(" 	", line[++n]))
-		;
-	av = get_av(&line[n]);
 	if (!av[1])
-	{
-		ft_super_free(2, av[0], av);
-		return ;
-	}
+		return (1);
 	if (av[2])
 	{
 		ft_putstr("cd: string not in pwd: ");
 		ft_putendl(av[1]);
-		n = -1;
-		while (av[++n])
-			free(av[n]);
-		free(av);
-		return ;
+		return (1);
 	}
 	if (access(av[1], F_OK))
 	{
 		ft_putstr("cd: no such file or directory: ");
 		ft_putendl(av[1]);
-		ft_super_free(3, av[0], av[1], av);
-		return ;
+		return (1);
 	}
 	if (access(av[1], R_OK))
 	{
 		ft_putstr("cd: permission denied: ");
 		ft_putendl(av[1]);
-		ft_super_free(3, av[0], av[1], av);
-		return ;
+		return (1);
 	}
 	if (chdir(av[1]))
 	{
 		ft_putstr("cd: not a directory: ");
 		ft_putendl(av[1]);
 	}
-	ft_super_free(3, av[0], av[1], av);
+	return (1);
 }
 
-int run_builtins(char *line, t_shell *shell)
+int ft_setenv(char **av, t_shell *shell)
+{
+	int len;
+	char **tmp;
+	int n;
+	int m;
+
+	if (!av[1])
+		return (1);
+	len = -1;
+	while (av[1][++len] != '=' && av[1][len])
+		;
+	if (!av[1][len])
+	{
+		ft_putendl("setenv: wrong forma");
+		return (1);
+	}
+	m = 0;
+	n = -1;
+	while (shell->shell_env[++n])
+		if (!ft_strncmp(shell->shell_env[n], av[1], len))
+		{
+			m = 1;
+			free(shell->shell_env[n]);
+			shell->shell_env[n] = ft_strdup(av[1]);
+		}
+	if (m)
+		return (1);
+	if (!(tmp = ft_memalloc(sizeof(char*) * (n + 2))))
+		return (0);
+	n = -1;
+	while (shell->shell_env[++n])
+		tmp[n] = shell->shell_env[n];
+	tmp[n] = ft_strdup(av[1]);
+	free(shell->shell_env);
+	shell->shell_env = tmp;
+	return (1);
+}
+
+int ft_unsetenv(char **av, t_shell *shell)
+{
+	int len;
+	char **tmp;
+	int n;
+	int m;
+
+	if (!av[1])
+		return (1);
+	len = -1;
+	while (av[1][++len])
+		;
+	m = 0;
+	n = -1;
+	while (shell->shell_env[++n])
+		if (!ft_strncmp(shell->shell_env[n], av[1], len) && 
+			shell->shell_env[n][len] == '=')
+			m = 1;
+	if (!m)
+	{
+		ft_putendl("unsetenv: unexisting variable");
+		return (1);
+	}
+	if (!(tmp = ft_memalloc(sizeof(char*) * n)))
+		return (0);
+	m = 0;
+	n = -1;
+	while (shell->shell_env[++n])
+	{
+		if (!ft_strncmp(shell->shell_env[n], av[1], len) && shell->shell_env[n][len] == '=')
+		{
+			m++;
+			free(shell->shell_env[n]);
+		}
+		else
+			tmp[n - m] = shell->shell_env[n];
+	}
+	free(shell->shell_env);
+	shell->shell_env = tmp;
+	return (1);
+}
+
+int run_builtins(char **av, t_shell *shell)
 {
 	int n;
 
-	n = -1;
-	while (ft_strchr(" 	", line[++n]))
-		;
-	if (!ft_strncmp("env", &line[n], 3))
+	if (!ft_strcmp("env", av[0]))
 	{
 		ft_print_tables(shell->shell_env);
 		return (0);	
 	}
-	if (!ft_strncmp("exit", &line[n], 4))
+	if (!ft_strcmp("exit", av[0]))
 	{
 		n = -1;
 		while (shell->shell_env[++n])
 			free(shell->shell_env[n]);
 		free(shell->shell_env);
 		free(shell->home);
-		free(line);
+		n = -1;
+		while (av[++n])
+			free(av[n]);
+		free(av);
 		exit(1);
 		return (0);
 	}
-	if (!ft_strncmp("cd", &line[n], 2))
+	if (!ft_strcmp("cd", av[0]))
 	{
-		ft_cd(line);	
+		ft_cd(av);
+		return (0);
+	}
+	if (!ft_strcmp("setenv", av[0]))
+	{
+		ft_setenv(av, shell);
+		return (0);
+	}
+	if (!ft_strcmp("unsetenv", av[0]))
+	{
+		ft_unsetenv(av, shell);
 		return (0);
 	}
 	return (1);
@@ -193,29 +268,21 @@ char **get_all_path(char **env)
 	return (tmp);
 }
 
-int run_non_builtin(char *line, t_shell *shell)
+int run_non_builtin(char **av, t_shell *shell)
 {
-	char *command;
-	char **av;
 	char **path;
 	char *tmp;
 	int n;
 
-	n = -1;
-	while (ft_strchr(" 	", line[++n]))
-		;
-	line = &line[n];
-	command = get_one_arg(line);
-	av = get_av(line);
-	if (!access(command, X_OK | F_OK))
-		run_command(command, av, shell);
+	if (!access(av[0], X_OK | F_OK))
+		run_command(av[0], av, shell);
 	else
 	{
 		path = get_all_path(shell->shell_env);
 		n = -1;
 		while (path[++n])
 		{
-			tmp = ft_super_join(3, path[n], "/", command);
+			tmp = ft_super_join(3, path[n], "/", av[0]);
 			if (!access(tmp, X_OK | F_OK))
 			{
 				run_command(tmp, av, shell);
@@ -226,18 +293,13 @@ int run_non_builtin(char *line, t_shell *shell)
 		if (!path[n])
 		{
 			ft_putstr("minishell: command not found: ");
-			ft_putendl(command);
+			ft_putendl(av[0]);
 		}
 		n = -1;
 		while (path[++n])
 			free(path[n]);
 		free(path);
 	}
-	n = -1;
-	while (av[++n])
-		free(av[n]);
-	free(av);
-	free(command);
 	return (1);
 }
 
@@ -245,6 +307,8 @@ int main(void)
 {
 	t_shell	*shell;
 	char *line;
+	char **av;
+	int n;
 
 	if (!(shell = ft_memalloc(sizeof(t_shell))))
 		return (-1);
@@ -253,9 +317,14 @@ int main(void)
 	{
 		write(1, "Super shell: ", 13);
 		get_next_line(0, &line);
-		if (run_builtins(line, shell))
-			run_non_builtin(line, shell);
+		av = get_av(line);
 		free(line);
+		if (run_builtins(av, shell))
+			run_non_builtin(av, shell);
+		n = -1;
+		while (av[++n])
+			free(av[n]);
+		free(av);
 	}
 	return (0);
 }
