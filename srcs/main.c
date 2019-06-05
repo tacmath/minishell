@@ -264,14 +264,13 @@ char **get_all_path(char **env)
 			m++;
 	if (!(tmp = ft_memalloc(sizeof(char*) * m)))
 		return (0);
-
-	m = 0;
+	m = -1;
 	i = 0;
-	while (path[n + ++m] != ':' && path[n + m])
+	while (path[++m] != ':' && path[m])
 		;
 	if (!(tmp[i] = ft_memalloc(sizeof(char) * (m + 1))))
 		return (0);
-	ft_strncpy(tmp[i++], &path[n], m);
+	ft_strncpy(tmp[i++], path, m);
 	n = -1;
 	while (path[++n])
 		if (path[n] == ':')
@@ -383,13 +382,13 @@ int main(void)
 		get_next_line(0, &line);
 		av = get_av(line);
 		free(line);
-		if (treat_av(av, shell))
+		if (treat_av(av, shell) && av[0] && av[0][0])
 			if (run_builtins(av, shell))
 				run_non_builtin(av, shell);
 		n = -1;
 		while (av[++n])
 			free(av[n]);
-		free(av);
+	free(av);
 	}
 	return (0);
 }
