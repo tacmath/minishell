@@ -15,11 +15,16 @@
 
 #include <signal.h>
 
+int tes = 1;
+
 void test(int t)
 {
-	t = 0;
-	signal(SIGINT, test);
-	write(1, "\n", 1);
+	if (t == 2)
+	{
+		write(1, "\n", 1);
+		if (tes == 1)
+			write(1, "Super shell: ", 13);
+	}
 }
 
 int main(void)
@@ -35,8 +40,11 @@ int main(void)
 	shell_init(shell);
 	while (1)
 	{
+		tes = 1;
 		write(1, "Super shell: ", 13);
-		get_next_line(0, &line);
+		if (get_next_line(0, &line) < 1)
+			return (-1);
+		tes = 0;
 		av = get_av(line);
 		free(line);
 		if (treat_av(av, shell) && av[0] && av[0][0])
