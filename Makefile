@@ -6,7 +6,7 @@
 #    By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+      #
 #                                                  #+#   #+    #+    #+#       #
 #    Created: 2018/11/05 12:24:50 by mtaquet      #+#   ##    ##    #+#        #
-#    Updated: 2019/02/21 14:55:37 by mtaquet     ###    #+. /#+    ###.fr      #
+#    Updated: 2019/06/06 14:07:00 by mtaquet     ###    #+. /#+    ###.fr      #
 #                                                          /                   #
 #                                                         /                    #
 # **************************************************************************** #
@@ -17,6 +17,11 @@ SRCDIR = srcs/
 INCDIR = includes/
 LIBFILES = libft.a
 SRCFILES = main.c\
+		   builtin1.c\
+		   builtin2.c\
+		   exe.c\
+		   init.c\
+		   command.c\
 
 INCFILES = minishell.h
 LIB = $(addprefix $(LIBDIR),$(LIBFILES))
