@@ -33,6 +33,10 @@ char **get_av(char *line)
 	int m;
 	char **tmp;
 
+	n = -1;
+	while (line[++n] && line[n] == ' ')
+		;
+	line = &line[n];
 	n = 0;
 	m = 2;
 	while (line[++n])
