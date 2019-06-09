@@ -93,6 +93,7 @@ int run_non_builtin(char **av, t_shell *shell)
 			if (!access(tmp, X_OK | F_OK))
 			{
 				run_command(tmp, av, shell);
+				free(tmp);
 				break ;
 			}
 			free(tmp);

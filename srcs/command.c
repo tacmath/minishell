@@ -37,11 +37,16 @@ char **get_av(char *line)
 	while (line[++n] && line[n] == ' ')
 		;
 	line = &line[n];
+	if (!line[0])
+	{
+		tmp = ft_memalloc(sizeof(char*));
+		return (tmp);
+	}
 	n = 0;
 	m = 2;
 	while (line[++n])
 		if (line[n - 1] == ' ' &&
-				line[n] != ' ' && line[n] != ';')
+				line[n] != ' ')
 			m++;
 	if (!(tmp = ft_memalloc(sizeof(char*) * m)))
 		return (0);
@@ -50,7 +55,7 @@ char **get_av(char *line)
 	m = 0;
 	while (line[++n])
 		if (line[n - 1] == ' '  &&
-				line[n] != ' '  && line[n] != ';')
+				line[n] != ' ')
 			tmp[++m] = get_one_arg(&line[n]);
 	return (tmp);
 }

@@ -72,8 +72,8 @@ int main(void)
 				if (treat_av(av, shell) && av[0] && av[0][0])
 					if (run_builtins(av, shell))
 						run_non_builtin(av, shell);
+				free_av(av);
 			}
-
 		free(line);
 	}
 	return (0);
