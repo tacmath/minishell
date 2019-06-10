@@ -19,7 +19,7 @@ char *get_one_arg(char *line)
 	char *tmp;
 
 	n = -1;
-	while (line[++n] != ' ' && line[n])
+	while (line[++n] != ' ' && line[n] != '\t'  && line[n])
 		;
 	if (!(tmp = ft_memalloc(sizeof(char) * (n + 1))))
 		return (0);
@@ -34,19 +34,16 @@ char **get_av(char *line)
 	char **tmp;
 
 	n = -1;
-	while (line[++n] && line[n] == ' ')
+	while (line[++n] && line[n] == ' ' && line[n] == '\t')
 		;
 	line = &line[n];
 	if (!line[0])
-	{
-		tmp = ft_memalloc(sizeof(char*));
-		return (tmp);
-	}
+		return (ft_memalloc(sizeof(char*)));
 	n = 0;
 	m = 2;
 	while (line[++n])
-		if (line[n - 1] == ' ' &&
-				line[n] != ' ')
+		if ((line[n - 1] == ' ' || line[n - 1] == '\t') &&
+			line[n] != ' ' && line[n] != '\t')
 			m++;
 	if (!(tmp = ft_memalloc(sizeof(char*) * m)))
 		return (0);
@@ -54,17 +51,41 @@ char **get_av(char *line)
 	n = 0;
 	m = 0;
 	while (line[++n])
-		if (line[n - 1] == ' '  &&
-				line[n] != ' ')
+		if ((line[n - 1] == ' ' || line[n - 1] == '\t') &&
+			line[n] != ' ' && line[n] != '\t')
 			tmp[++m] = get_one_arg(&line[n]);
 	return (tmp);
+}
+
+int treat_dollar(char **av, t_shell *shell, int n)
+{
+	char *tmp;
+	int m;
+
+	m = -1;
+	while (shell->shell_env[++m])
+		if (!ft_strncmp(&av[n][1], shell->shell_env[m], ft_strlen(&av[n][1])))
+		{
+			tmp = ft_strdup(&shell->shell_env[m][ft_strlen(av[n])]);
+			free(av[n]);
+			av[n] = tmp;
+			break ;
+		}
+	if (!shell->shell_env[m])
+	{
+		free(av[n]);
+		m = n;
+		while (av[++m])
+			av[m - 1] = av[m];
+		av[m - 1] = av[m];
+	}
+	return (1);
 }
 
 int treat_av(char **av, t_shell *shell)
 {
 	char *tmp;
 	int n;
-	int m;
 
 	n = -1;
 	while (av[++n])
@@ -82,25 +103,7 @@ int treat_av(char **av, t_shell *shell)
 			av[n] = tmp;
 		}
 		else if (av[n][0] == '$')
-		{
-			m = -1;
-			while (shell->shell_env[++m])
-				if (!ft_strncmp(&av[n][1], shell->shell_env[m], ft_strlen(&av[n][1])))
-				{
-					tmp = ft_strdup(&shell->shell_env[m][ft_strlen(av[n])]);
-					free(av[n]);
-					av[n] = tmp;
-					break ;
-				}
-			if (!shell->shell_env[m])
-			{
-				free(av[n]);
-				m = n;
-				while (av[++m])
-					av[m - 1] = av[m];
-				av[m - 1] = av[m];
-			}
-		}
+			treat_dollar(av, shell, n);
 	}
 	return (1);
 }

@@ -37,13 +37,38 @@ void free_av(char **av)
 	free(av);
 }
 
+int treat_line(char *line, t_shell *shell)
+{
+	char **av;
+	int n;
+	int m;
+
+	n = 0;
+	m = 0;
+	while (line[n++])
+		if (!line[n] || line[n] == ';')
+		{
+			if (line[n] == ';')
+			{
+				line[n] = 0;
+				av = get_av(&line[m]);
+				m = ++n;
+			}
+			else
+				av = get_av(&line[m]);
+			if (treat_av(av, shell) && av[0] && av[0][0])
+				if (run_builtins(av, shell))
+					run_non_builtin(av, shell);
+			free_av(av);
+		}
+	free(line);
+	return (1);
+}
+
 int main(void)
 {
 	t_shell	*shell;
 	char *line;
-	char **av;
-	int n;
-	int m;
 
 	signal(SIGINT, test);
 	if (!(shell = ft_memalloc(sizeof(t_shell))))
@@ -56,25 +81,7 @@ int main(void)
 		if (get_next_line(0, &line) < 1)
 			return (-1);
 		tes = 0;
-		n = 0;
-		m = 0;
-		while (line[n++])
-			if (!line[n] || line[n] == ';')
-			{
-				if (line[n] == ';')
-				{
-					line[n] = 0;
-					av = get_av(&line[m]);
-					m = ++n;
-				}
-				else
-					av = get_av(&line[m]);
-				if (treat_av(av, shell) && av[0] && av[0][0])
-					if (run_builtins(av, shell))
-						run_non_builtin(av, shell);
-				free_av(av);
-			}
-		free(line);
+		treat_line(line, shell);
 	}
 	return (0);
 }

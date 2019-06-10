@@ -27,50 +27,38 @@ void ft_echo(char **av)
 	ft_putchar('\n');
 }
 
-int run_builtins(char **av, t_shell *shell)
+void free_shell(t_shell *shell)
 {
 	int n;
 
+	n = -1;
+	while (shell->shell_env[++n])
+		free(shell->shell_env[n]);
+	free(shell->shell_env);
+	free(shell->home);
+	free(shell->last_dir);
+	free(shell);
+}
+
+int run_builtins(char **av, t_shell *shell)
+{
 	if (!ft_strcmp("env", av[0]))
-	{
 		ft_print_tables(shell->shell_env);
-		return (0);
-	}
-	if (!ft_strcmp("exit", av[0]))
+	else if (!ft_strcmp("exit", av[0]))
 	{
-		n = -1;
-		while (shell->shell_env[++n])
-			free(shell->shell_env[n]);
-		free(shell->shell_env);
-		free(shell->home);
-		free(shell->last_dir);
-		free(shell);
-		n = -1;
-		while (av[++n])
-			free(av[n]);
-		free(av);
+		free_shell(shell);
+		free_av(av);
 		exit(1);
-		return (0);
 	}
-	if (!ft_strcmp("cd", av[0]))
-	{
+	else if (!ft_strcmp("cd", av[0]))
 		ft_cd(av, shell);
-		return (0);
-	}
-	if (!ft_strcmp("setenv", av[0]))
-	{
+	else if (!ft_strcmp("setenv", av[0]))
 		ft_setenv(av, shell);
-		return (0);
-	}
-	if (!ft_strcmp("unsetenv", av[0]))
-	{
+	else if (!ft_strcmp("unsetenv", av[0]))
 		ft_unsetenv(av, shell);
-		return (0);
-	}
-	if (!ft_strcmp("echo", av[0]))
-	{
+	else if (!ft_strcmp("echo", av[0]))
 		ft_echo(av);
-		return (0);
-	}
-	return (1);
+	else
+		return (1);
+	return (0);
 }

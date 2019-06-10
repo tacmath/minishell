@@ -16,8 +16,19 @@
 int run_command(char *path, char **av, t_shell *shell)
 {
 	pid_t    father;
-
-	change_env(shell->shell_env, "_", path);
+	char	*tmp;
+	char	*path_tmp;
+	
+	if (path[0] == '.')
+	{
+		path_tmp = getcwd(0, 0);
+		tmp = ft_super_join(3, path_tmp, "/", path);
+		free(path_tmp);
+	}
+	else
+		tmp = ft_strdup(path);
+	change_env(shell->shell_env, "_", tmp);
+	free(tmp);
 	father = fork();
 	if (father == 0)
 		if (execve(path, av, shell->shell_env) == -1)
@@ -27,11 +38,38 @@ int run_command(char *path, char **av, t_shell *shell)
 	return (1);
 }
 
-char **get_all_path(char **env)
+int 	alloc_path(char *path, char **tmp)
 {
 	int n;
 	int m;
 	int i;
+	
+	m = -1;
+	i = 0;
+	while (path[++m] != ':' && path[m])
+		;
+	if (!(tmp[i] = ft_memalloc(sizeof(char) * (m + 1))))
+		return (0);
+	ft_strncpy(tmp[i++], path, m);
+	n = -1;
+	while (path[++n])
+		if (path[n] == ':')
+		{
+			n++;
+			m = 0;
+			while (path[n + ++m] != ':' && path[n + m])
+				;
+			if (!(tmp[i] = ft_memalloc(sizeof(char) * (m + 1))))
+				return (0);
+			ft_strncpy(tmp[i++], &path[n], m);
+		}
+	return (1);
+}
+
+char **get_all_path(char **env)
+{
+	int n;
+	int m;
 	char **tmp;
 	char *path;
 
@@ -53,25 +91,7 @@ char **get_all_path(char **env)
 			m++;
 	if (!(tmp = ft_memalloc(sizeof(char*) * m)))
 		return (0);
-	m = -1;
-	i = 0;
-	while (path[++m] != ':' && path[m])
-		;
-	if (!(tmp[i] = ft_memalloc(sizeof(char) * (m + 1))))
-		return (0);
-	ft_strncpy(tmp[i++], path, m);
-	n = -1;
-	while (path[++n])
-		if (path[n] == ':')
-		{
-			n++;
-			m = 0;
-			while (path[n + ++m] != ':' && path[n + m])
-				;
-			if (!(tmp[i] = ft_memalloc(sizeof(char) * (m + 1))))
-				return (0);
-			ft_strncpy(tmp[i++], &path[n], m);
-		}
+	alloc_path(path, tmp);
 	return (tmp);
 }
 
@@ -103,10 +123,7 @@ int run_non_builtin(char **av, t_shell *shell)
 			ft_putstr("minishell: command not found: ");
 			ft_putendl(av[0]);
 		}
-		n = -1;
-		while (path[++n])
-			free(path[n]);
-		free(path);
+		free_av(path);
 	}
 	return (1);
 }

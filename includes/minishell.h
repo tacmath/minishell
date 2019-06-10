@@ -23,6 +23,8 @@ int ft_cd(char **av, t_shell *shell);
 int ft_setenv(char **av, t_shell *shell);
 int ft_unsetenv(char **av, t_shell *shell);
 int run_builtins(char **av, t_shell *shell);
+void free_shell(t_shell *shell);
+void free_av(char **av);
 int shell_init(t_shell *shell);
 char **get_av(char *line);
 int treat_av(char **av, t_shell *shell);
