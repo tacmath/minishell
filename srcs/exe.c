@@ -95,35 +95,39 @@ char **get_all_path(char **env)
 	return (tmp);
 }
 
-int run_non_builtin(char **av, t_shell *shell)
+int run_with_path(char **av, t_shell *shell)
 {
 	char **path;
 	char *tmp;
 	int n;
 
+	path = get_all_path(shell->shell_env);
+	n = -1;
+	while (path[++n])
+	{
+		tmp = ft_super_join(3, path[n], "/", av[0]);
+		if (!access(tmp, X_OK | F_OK))
+		{
+			run_command(tmp, av, shell);
+			free(tmp);
+			break ;
+		}
+		free(tmp);
+	}
+	if (!path[n])
+	{
+		ft_putstr("minishell: command not found: ");
+		ft_putendl(av[0]);
+	}
+	free_av(path);
+	return (1);
+}
+
+int run_non_builtin(char **av, t_shell *shell)
+{
 	if (!access(av[0], X_OK | F_OK))
 		run_command(av[0], av, shell);
 	else
-	{
-		path = get_all_path(shell->shell_env);
-		n = -1;
-		while (path[++n])
-		{
-			tmp = ft_super_join(3, path[n], "/", av[0]);
-			if (!access(tmp, X_OK | F_OK))
-			{
-				run_command(tmp, av, shell);
-				free(tmp);
-				break ;
-			}
-			free(tmp);
-		}
-		if (!path[n])
-		{
-			ft_putstr("minishell: command not found: ");
-			ft_putendl(av[0]);
-		}
-		free_av(path);
-	}
+		run_with_path(av, shell);
 	return (1);
 }
