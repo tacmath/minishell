@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/06/06 14:10:39 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/06/11 11:51:22 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/06/11 12:54:18 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -54,9 +54,10 @@ int	shell_init(t_shell *shell, char **env, char *name)
 	n = -1;
 	while (env[++n])
 		if (!ft_strncmp(env[n], "HOME=", 5))
-			shell->home = ft_strdup(&env[n][5]);
-	if (!shell->home)
-		shell->home = getcwd(0, 0);
+			if (!(shell->home = ft_strdup(&env[n][5])))
+				return (0);
+	if (!shell->home && (shell->home = getcwd(0, 0)))
+		return (0);
 	shell->last_dir = 0;
 	env_init(shell, env);
 	if (name[0] == '.')
@@ -65,8 +66,8 @@ int	shell_init(t_shell *shell, char **env, char *name)
 		tmp = ft_super_join(3, path_tmp, "/", name);
 		free(path_tmp);
 	}
-	else
-		tmp = ft_strdup(name);
+	else if (!(tmp = ft_strdup(name)))
+		return (0);
 	change_env(shell->shell_env, "SHELL", tmp);
 	free(tmp);
 	return (1);

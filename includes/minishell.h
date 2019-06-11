@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/06/11 11:01:59 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/06/11 11:44:53 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/06/11 12:46:00 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -32,10 +32,9 @@ int						run_non_builtin(char **av, t_shell *shell);
 int						change_env(char **env, char *var, char *new);
 int						ft_cd(char **av, t_shell *shell);
 int						ft_setenv(char **av, t_shell *shell);
-int						ft_unsetenv(char **av, t_shell *shell);
 int						run_builtins(char **av, t_shell *shell);
 void					free_shell(t_shell *shell);
-void					free_av(char **av);
+int						free_av(char **av);
 int						shell_init(t_shell *shell, char **env, char *name);
 char					**get_av(char *line);
 int						treat_av(char **av, t_shell *shell);

@@ -6,23 +6,78 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/06/06 14:07:59 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/06/11 11:16:27 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/06/11 13:06:32 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
+int		get_len(char **av, t_shell *shell)
+{
+	int	len;
+	int	n;
+	int	m;
+
+	if (!av[1])
+		return (-1);
+	len = -1;
+	while (av[1][++len])
+		;
+	n = -1;
+	m = 0;
+	while (shell->shell_env[++n])
+		if (!ft_strncmp(shell->shell_env[n], av[1], len) &&
+				shell->shell_env[n][len] == '=')
+			m = 1;
+	if (!m)
+	{
+		ft_putendl("unsetenv: unexisting variable");
+		return (-1);
+	}
+	return (len);
+}
+
+int		ft_unsetenv(char **av, t_shell *shell)
+{
+	int		len;
+	char	**tmp;
+	int		n;
+	int		m;
+
+	if ((len = get_len(av, shell)) == -1)
+		return (1);
+	n = -1;
+	while (shell->shell_env[++n])
+		;
+	if (!(tmp = ft_memalloc(sizeof(char*) * n)))
+		return (0);
+	m = 0;
+	n = -1;
+	while (shell->shell_env[++n])
+		if (!ft_strncmp(shell->shell_env[n], av[1], len)
+				&& shell->shell_env[n][len] == '=' && ++m)
+			free(shell->shell_env[n]);
+		else
+			tmp[n - m] = shell->shell_env[n];
+	free(shell->shell_env);
+	shell->shell_env = tmp;
+	return (1);
+}
+
 void	ft_echo(char **av)
 {
 	int n;
 
-	ft_putstr(av[1]);
-	n = 1;
-	while (av[++n])
+	if (av[1])
 	{
-		ft_putchar(' ');
-		ft_putstr(av[n]);
+		ft_putstr(av[1]);
+		n = 1;
+		while (av[++n])
+		{
+			ft_putchar(' ');
+			ft_putstr(av[n]);
+		}
 	}
 	ft_putchar('\n');
 }

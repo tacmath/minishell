@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/06/06 14:08:18 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/06/11 11:52:47 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/06/11 13:20:26 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -71,7 +71,8 @@ int		treat_dollar(char **av, t_shell *shell, int n)
 
 	m = -1;
 	while (shell->shell_env[++m])
-		if (!ft_strncmp(&av[n][1], shell->shell_env[m], ft_strlen(&av[n][1])))
+		if (!ft_strncmp(&av[n][1], shell->shell_env[m], ft_strlen(&av[n][1]))
+				&& shell->shell_env[m][ft_strlen(&av[n][1])] == '=')
 		{
 			tmp = ft_strdup(&shell->shell_env[m][ft_strlen(av[n])]);
 			free(av[n]);
