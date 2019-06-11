@@ -6,19 +6,19 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/06/06 14:10:20 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/06/06 15:17:59 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/06/11 11:25:28 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int run_command(char *path, char **av, t_shell *shell)
+int		run_command(char *path, char **av, t_shell *shell)
 {
-	pid_t    father;
+	pid_t	father;
 	char	*tmp;
 	char	*path_tmp;
-	
+
 	if (path[0] == '.')
 	{
 		path_tmp = getcwd(0, 0);
@@ -38,12 +38,12 @@ int run_command(char *path, char **av, t_shell *shell)
 	return (1);
 }
 
-int 	alloc_path(char *path, char **tmp)
+int		alloc_path(char *path, char **tmp)
 {
 	int n;
 	int m;
 	int i;
-	
+
 	m = -1;
 	i = 0;
 	while (path[++m] != ':' && path[m])
@@ -66,12 +66,12 @@ int 	alloc_path(char *path, char **tmp)
 	return (1);
 }
 
-char **get_all_path(char **env)
+char	**get_all_path(char **env)
 {
-	int n;
-	int m;
-	char **tmp;
-	char *path;
+	int		n;
+	int		m;
+	char	**tmp;
+	char	*path;
 
 	n = -1;
 	path = 0;
@@ -95,11 +95,11 @@ char **get_all_path(char **env)
 	return (tmp);
 }
 
-int run_with_path(char **av, t_shell *shell)
+int		run_with_path(char **av, t_shell *shell)
 {
-	char **path;
-	char *tmp;
-	int n;
+	char	**path;
+	char	*tmp;
+	int		n;
 
 	path = get_all_path(shell->shell_env);
 	n = -1;
@@ -123,7 +123,7 @@ int run_with_path(char **av, t_shell *shell)
 	return (1);
 }
 
-int run_non_builtin(char **av, t_shell *shell)
+int		run_non_builtin(char **av, t_shell *shell)
 {
 	if (!access(av[0], X_OK | F_OK))
 		run_command(av[0], av, shell);

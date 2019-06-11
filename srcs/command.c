@@ -6,20 +6,20 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/06/06 14:08:18 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/06/06 14:10:03 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/06/11 11:52:47 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-char *get_one_arg(char *line)
+char	*get_one_arg(char *line)
 {
-	int n;
-	char *tmp;
+	int		n;
+	char	*tmp;
 
 	n = -1;
-	while (line[++n] != ' ' && line[n] != '\t'  && line[n])
+	while (line[++n] != ' ' && line[n] != '\t' && line[n])
 		;
 	if (!(tmp = ft_memalloc(sizeof(char) * (n + 1))))
 		return (0);
@@ -27,16 +27,23 @@ char *get_one_arg(char *line)
 	return (tmp);
 }
 
-char **get_av(char *line)
+char	*check_line(char *line)
 {
 	int n;
-	int m;
-	char **tmp;
 
 	n = -1;
-	while (line[++n] && line[n] == ' ' && line[n] == '\t')
+	while (line[++n] == ' ' || line[n] == '\t')
 		;
-	line = &line[n];
+	return (&line[n]);
+}
+
+char	**get_av(char *line)
+{
+	int		n;
+	int		m;
+	char	**tmp;
+
+	line = check_line(line);
 	if (!line[0])
 		return (ft_memalloc(sizeof(char*)));
 	n = 0;
@@ -45,9 +52,9 @@ char **get_av(char *line)
 		if ((line[n - 1] == ' ' || line[n - 1] == '\t') &&
 			line[n] != ' ' && line[n] != '\t')
 			m++;
-	if (!(tmp = ft_memalloc(sizeof(char*) * m)))
+	if (!(tmp = ft_memalloc(sizeof(char*) * m))
+		|| !(tmp[0] = get_one_arg(line)))
 		return (0);
-	tmp[0] = get_one_arg(line);
 	n = 0;
 	m = 0;
 	while (line[++n])
@@ -57,10 +64,10 @@ char **get_av(char *line)
 	return (tmp);
 }
 
-int treat_dollar(char **av, t_shell *shell, int n)
+int		treat_dollar(char **av, t_shell *shell, int n)
 {
-	char *tmp;
-	int m;
+	char	*tmp;
+	int		m;
 
 	m = -1;
 	while (shell->shell_env[++m])
@@ -82,10 +89,10 @@ int treat_dollar(char **av, t_shell *shell, int n)
 	return (1);
 }
 
-int treat_av(char **av, t_shell *shell)
+int		treat_av(char **av, t_shell *shell)
 {
-	char *tmp;
-	int n;
+	char	*tmp;
+	int		n;
 
 	n = -1;
 	while (av[++n])

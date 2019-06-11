@@ -6,14 +6,14 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/06/06 14:07:43 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/06/06 15:13:19 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/06/11 11:16:02 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int cd_check(char **av, t_shell *shell, char *tmp)
+int	cd_check(char **av, t_shell *shell, char *tmp)
 {
 	if (!av[1])
 		return (1);
@@ -42,7 +42,7 @@ int cd_check(char **av, t_shell *shell, char *tmp)
 	return (0);
 }
 
-int ft_cd(char **av, t_shell *shell)
+int	ft_cd(char **av, t_shell *shell)
 {
 	char *tmp;
 
@@ -68,11 +68,10 @@ int ft_cd(char **av, t_shell *shell)
 	return (1);
 }
 
-int env_realloc(char **av, t_shell *shell, int n)
+int	env_realloc(char **av, t_shell *shell, int n)
 {
 	char **tmp;
 
-	
 	if (!(tmp = ft_memalloc(sizeof(char*) * (n + 2))))
 		return (0);
 	n = -1;
@@ -84,7 +83,7 @@ int env_realloc(char **av, t_shell *shell, int n)
 	return (1);
 }
 
-int ft_setenv(char **av, t_shell *shell)
+int	ft_setenv(char **av, t_shell *shell)
 {
 	int len;
 	int n;
@@ -111,11 +110,11 @@ int ft_setenv(char **av, t_shell *shell)
 	return (1);
 }
 
-int get_len(char **av, t_shell *shell)
+int	get_len(char **av, t_shell *shell)
 {
-	int len;
-	int n;
-	int m;
+	int	len;
+	int	n;
+	int	m;
 
 	if (!av[1])
 		return (-1);
@@ -136,14 +135,14 @@ int get_len(char **av, t_shell *shell)
 	return (len);
 }
 
-int ft_unsetenv(char **av, t_shell *shell)
+int	ft_unsetenv(char **av, t_shell *shell)
 {
-	int len;
-	char **tmp;
-	int n;
-	int m;
+	int		len;
+	char	**tmp;
+	int		n;
+	int		m;
 
-	if ((len =  get_len(av, shell)) == -1)
+	if ((len = get_len(av, shell)) == -1)
 		return (1);
 	n = -1;
 	while (shell->shell_env[++n])
@@ -153,11 +152,9 @@ int ft_unsetenv(char **av, t_shell *shell)
 	m = 0;
 	n = -1;
 	while (shell->shell_env[++n])
-		if (!ft_strncmp(shell->shell_env[n], av[1], len) && shell->shell_env[n][len] == '=')
-		{
-			m++;
+		if (!ft_strncmp(shell->shell_env[n], av[1], len)
+				&& shell->shell_env[n][len] == '=' && ++m)
 			free(shell->shell_env[n]);
-		}
 		else
 			tmp[n - m] = shell->shell_env[n];
 	free(shell->shell_env);

@@ -6,20 +6,21 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/06/06 14:10:39 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/06/06 15:23:39 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/06/11 11:51:22 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int change_env(char **env, char *var, char *new)
+int	change_env(char **env, char *var, char *new)
 {
 	int n;
 
 	n = -1;
 	while (env[++n])
-		if (!ft_strncmp(env[n], var, ft_strlen(var)) && env[n][ft_strlen(var)] == '=')
+		if (!ft_strncmp(env[n], var, ft_strlen(var))
+			&& env[n][ft_strlen(var)] == '=')
 		{
 			free(env[n]);
 			env[n] = ft_super_join(3, var, "=", new);
@@ -28,43 +29,45 @@ int change_env(char **env, char *var, char *new)
 	return (1);
 }
 
-int env_init(t_shell *shell)
+int	env_init(t_shell *shell, char **env)
 {
 	int n;
-	
+
 	n = -1;
-	while (environ[++n])
+	while (env[++n])
 		;
 	if (!(shell->shell_env = ft_memalloc(sizeof(char*) * ++n)))
 		return (0);
 	n = -1;
-	while (environ[++n])
-		shell->shell_env[n] = ft_strdup(environ[n]);
+	while (env[++n])
+		shell->shell_env[n] = ft_strdup(env[n]);
 	return (1);
 }
 
-int shell_init(t_shell *shell)
+int	shell_init(t_shell *shell, char **env, char *name)
 {
-	int n;
-	char *tmp;
+	int		n;
+	char	*tmp;
+	char	*path_tmp;
 
 	shell->home = 0;
 	n = -1;
-	while (environ[++n])
-		if (!ft_strncmp(environ[n], "HOME=", 5))
-			shell->home = ft_strdup(&environ[n][5]);
+	while (env[++n])
+		if (!ft_strncmp(env[n], "HOME=", 5))
+			shell->home = ft_strdup(&env[n][5]);
 	if (!shell->home)
 		shell->home = getcwd(0, 0);
 	shell->last_dir = 0;
-	env_init(shell);
-	n = -1;
-	while (environ[++n])
-		if (!ft_strncmp(environ[n], "_=", 2))
-		{
-			tmp = ft_strdup(&environ[n][2]);
-			change_env(shell->shell_env, "SHELL", tmp);
-			free(tmp);
-			break ;
-		}
+	env_init(shell, env);
+	if (name[0] == '.')
+	{
+		path_tmp = getcwd(0, 0);
+		tmp = ft_super_join(3, path_tmp, "/", name);
+		free(path_tmp);
+	}
+	else
+		tmp = ft_strdup(name);
+	change_env(shell->shell_env, "SHELL", tmp);
+	free(tmp);
 	return (1);
 }
