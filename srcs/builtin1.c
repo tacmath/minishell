@@ -16,7 +16,10 @@
 int	cd_check(char **av, t_shell *shell, char *tmp)
 {
 	if (!av[1])
+	{	
+		chdir(shell->home);
 		return (1);
+	}
 	if (av[2])
 	{
 		ft_putstr("cd: string not in pwd: ");
