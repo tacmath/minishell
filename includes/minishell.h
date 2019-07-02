@@ -19,12 +19,23 @@
 # include <stdlib.h>
 # include <sys/types.h>
 # include <sys/wait.h>
+# include <termios.h>
+# include <termcap.h>
+
+# define PROMPT "Super Shell: "
+# define K_UP 4283163
+# define K_DOWN 4348699
+# define K_RIGHT 4414235
+# define K_LEFT 4479771
+# define K_RETURN 10
+# define K_BACKSPACE 127
 
 struct					s_shell
 {
 	char				*home;
 	char				*last_dir;
 	char				**shell_env;
+	struct termios			old_term;
 };
 
 typedef struct s_shell	t_shell;

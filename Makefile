@@ -39,7 +39,7 @@ lib: $(LIBDIR)
 	@make -C $(LIBDIR)
 
 $(NAME): $(LIB) $(OBJ) $(INC)
-	gcc -o $@ $(OBJ) $(FLAG) $(LIB) 
+	gcc -o $@ $(OBJ) $(FLAG) -ltermcap $(LIB) 
 
 clean:
 	rm -f $(OBJ)

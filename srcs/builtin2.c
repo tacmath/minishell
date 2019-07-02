@@ -87,11 +87,15 @@ void	free_shell(t_shell *shell)
 	int n;
 
 	n = -1;
-	while (shell->shell_env[++n])
-		free(shell->shell_env[n]);
-	free(shell->shell_env);
+	if (shell->shell_env)
+	{
+		while (shell->shell_env[++n])
+			free(shell->shell_env[n]);
+		free(shell->shell_env);
+	}
 	free(shell->home);
 	free(shell->last_dir);
+	tcsetattr(0, TCSANOW, &shell->old_term);
 	free(shell);
 }
 

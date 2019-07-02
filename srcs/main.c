@@ -23,8 +23,13 @@ void	test(int t)
 	{
 		write(1, "\n", 1);
 		if (g_tes == 1)
-			write(1, "Super Shell: ", 13);
+			write(1, PROMPT, ft_strlen(PROMPT));
 	}
+}
+
+int oputchar(int c)
+{
+	return (write(2, &c, 1));
 }
 
 int		free_av(char **av)
@@ -67,6 +72,136 @@ int		treat_line(char *line, t_shell *shell)
 	return (1);
 }
 
+char		*return_line(char *line1, char *line2)
+{
+	char *tmp;	
+	
+	if (!(tmp = ft_super_join(2, line1, line2)))
+	{
+		ft_super_free(2, line1, line2);
+		return (0);
+	}
+	write(1, "\n", 1);
+	ft_super_free(2, line1, line2);
+	return (tmp);
+}
+
+char		*add_to_line(char *line1, char *line2, char *new)
+{
+	char *tmp;
+	
+	if (!(tmp = ft_super_join(2, line1, new)))
+	{
+		ft_super_free(2, line1, line2);
+		return (0);
+	}
+	free(line1);
+	write(1, new, ft_strlen(new));
+	write(1, line2, ft_strlen(line2));
+	tputs(tgoto(tgetstr("ch", 0), 0, ft_strlen(tmp) + ft_strlen(PROMPT)), 1, oputchar);
+	return (tmp);
+}
+
+void	remove_one_char(char *line1, char *line2)
+{
+	int len;
+
+	len = ft_strlen(line1);
+	if (len)
+	{
+		line1[len - 1] = 0;
+		len--;
+		tputs(tgoto(tgetstr("ch", 0), 0, len + ft_strlen(PROMPT)), 1, oputchar);
+		write(1, line2, ft_strlen(line2));
+		write(1, " ", 1);
+		tputs(tgoto(tgetstr("ch", 0), 0, len + ft_strlen(PROMPT)), 1, oputchar);
+	}
+}
+
+int go_to_right(char **line1, char **line2)
+{
+	int len;
+	char *tmp;
+
+	len = ft_strlen(*line2);
+	if (len)
+	{
+		len = ft_strlen(*line1);
+		if (!(tmp = ft_memalloc(len + 2)))
+		{
+			ft_super_free(2, *line1, *line2);
+			return (0);
+		}
+		ft_strcpy(tmp, *line1);
+		tmp[len] = (*line2)[0];
+		free(*line1);
+		*line1 = tmp;
+		ft_strcpy(*line2, &(*line2)[1]);
+		tputs(tgoto(tgetstr("ch", 0), 0, ft_strlen(*line1) + ft_strlen(PROMPT)), 1, oputchar);
+	}
+	return (1);
+}
+
+int go_to_left(char **line1, char **line2)
+{
+	int len1;
+	int len2;
+	char *tmp;
+
+	len1 = ft_strlen(*line1);
+	if (len1)
+	{
+		len2 = ft_strlen(*line2);
+		if (!(tmp = ft_memalloc(len2 + 2)))
+		{
+			ft_super_free(2, *line1, *line2);
+			return (0);
+		}
+		ft_strcpy(&tmp[1], *line2);
+		tmp[0] = (*line1)[len1 - 1];
+		(*line1)[len1 - 1] = 0;
+		free(*line2);
+		*line2 = tmp;
+		tputs(tgoto(tgetstr("ch", 0), 0, ft_strlen(*line1) + ft_strlen(PROMPT)), 1, oputchar);
+	}
+	return (1);
+}
+
+char		*get_line(void)
+{
+	char *line1;
+	char *line2;
+	long int buf;
+	
+	if (!(line1 = ft_memalloc(1)))
+		return (0);
+	if (!(line2 = ft_memalloc(1)))
+	{
+		free(line1);
+		return (0);
+	}
+	while (1)
+	{
+		buf = 0;
+		if (read(0, &buf, 7) <= 0)
+			return (0);
+		if (buf == K_UP)
+			;
+		else if	(buf == K_DOWN)
+			;
+		else if	(buf == K_RIGHT)
+			go_to_right(&line1, &line2);
+		else if	(buf == K_LEFT)
+			go_to_left(&line1, &line2);
+		else if	(buf == K_BACKSPACE)
+			remove_one_char(line1, line2);
+		else if	(buf == K_RETURN)
+			return (return_line(line1, line2));
+		else if (!(line1 = add_to_line(line1, line2, (char*)(&buf))))
+			return (0);
+	}
+}
+
 int		main(int ac, char **av, char **env)
 {
 	t_shell	*shell;
@@ -76,12 +211,16 @@ int		main(int ac, char **av, char **env)
 	ac = 0;
 	if (!(shell = ft_memalloc(sizeof(t_shell))))
 		return (-1);
-	shell_init(shell, env, av[0]);
+	if (!shell_init(shell, env, av[0]))
+	{
+			free_shell(shell);
+			return (-1);
+	}
 	while (1)
 	{
 		g_tes = 1;
-		write(1, "Super Shell: ", 13);
-		if (get_next_line(0, &line) < 1)
+		write(1, PROMPT, ft_strlen(PROMPT));
+		if (!(line = get_line()))
 		{
 			free_shell(shell);
 			return (-1);

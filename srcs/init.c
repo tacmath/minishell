@@ -44,12 +44,33 @@ int	env_init(t_shell *shell, char **env)
 	return (1);
 }
 
+int term_init(t_shell *shell)
+{
+	struct termios config;
+
+	if (!isatty(0))	
+		return (0);
+	if (tcgetattr(0, &shell->old_term) < 0)
+		return (0);
+	config = shell->old_term;
+	config.c_lflag &= ~(ECHO | ICANON);
+	config.c_cc[VMIN] = 1;
+	config.c_cc[VTIME] = 0;
+	if (tcsetattr(0, TCSANOW, &config) < 0)
+		return (0);
+	if (tgetent(0, getenv("TERM")) < 1)
+		return (0);
+	return (1);
+}
+
 int	shell_init(t_shell *shell, char **env, char *name)
 {
 	int		n;
 	char	*tmp;
 	char	*path_tmp;
-
+	
+	if (!term_init(shell))
+		return (0);
 	shell->home = 0;
 	n = -1;
 	while (env[++n])
