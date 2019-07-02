@@ -32,6 +32,33 @@ int oputchar(int c)
 	return (write(2, &c, 1));
 }
 
+int get_strlen(char *str)
+{
+	int n;
+	int len;
+	char *prompt;
+
+	prompt = PROMPT;
+	len = 0;
+	n = -1;
+	while (prompt[++n])
+	{
+		if (prompt[n] == '\t')
+			len += 8 - len % 8;
+		else
+			len++;
+	}
+	n = -1;
+	while (str[++n])
+	{
+		if (str[n] == '\t')
+			len += 8 - len % 8;
+		else
+			len++;
+	}
+	return (len);
+}
+
 int		free_av(char **av)
 {
 	int n;
@@ -96,9 +123,10 @@ char		*add_to_line(char *line1, char *line2, char *new)
 		return (0);
 	}
 	free(line1);
+	tputs(tgetstr("ce", 0), 1, oputchar);	
 	write(1, new, ft_strlen(new));
 	write(1, line2, ft_strlen(line2));
-	tputs(tgoto(tgetstr("ch", 0), 0, ft_strlen(tmp) + ft_strlen(PROMPT)), 1, oputchar);
+	tputs(tgoto(tgetstr("ch", 0), 0, get_strlen(tmp)), 1, oputchar);
 	return (tmp);
 }
 
@@ -110,11 +138,10 @@ void	remove_one_char(char *line1, char *line2)
 	if (len)
 	{
 		line1[len - 1] = 0;
-		len--;
-		tputs(tgoto(tgetstr("ch", 0), 0, len + ft_strlen(PROMPT)), 1, oputchar);
+		tputs(tgoto(tgetstr("ch", 0), 0, get_strlen(line1)), 1, oputchar);
+		tputs(tgetstr("ce", 0), 1, oputchar);
 		write(1, line2, ft_strlen(line2));
-		write(1, " ", 1);
-		tputs(tgoto(tgetstr("ch", 0), 0, len + ft_strlen(PROMPT)), 1, oputchar);
+		tputs(tgoto(tgetstr("ch", 0), 0, get_strlen(line1)), 1, oputchar);
 	}
 }
 
@@ -137,7 +164,7 @@ int go_to_right(char **line1, char **line2)
 		free(*line1);
 		*line1 = tmp;
 		ft_strcpy(*line2, &(*line2)[1]);
-		tputs(tgoto(tgetstr("ch", 0), 0, ft_strlen(*line1) + ft_strlen(PROMPT)), 1, oputchar);
+		tputs(tgoto(tgetstr("ch", 0), 0, get_strlen(*line1)), 1, oputchar);
 	}
 	return (1);
 }
@@ -162,7 +189,7 @@ int go_to_left(char **line1, char **line2)
 		(*line1)[len1 - 1] = 0;
 		free(*line2);
 		*line2 = tmp;
-		tputs(tgoto(tgetstr("ch", 0), 0, ft_strlen(*line1) + ft_strlen(PROMPT)), 1, oputchar);
+		tputs(tgoto(tgetstr("ch", 0), 0, get_strlen(*line1)), 1, oputchar);
 	}
 	return (1);
 }
