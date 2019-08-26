@@ -23,6 +23,7 @@
 # include <termcap.h>
 
 # define PROMPT "Super Shell: "
+# define MAX_MEM 100
 # define K_UP 4283163
 # define K_DOWN 4348699
 # define K_RIGHT 4414235
@@ -35,6 +36,8 @@ struct					s_shell
 	char				*home;
 	char				*last_dir;
 	char				**shell_env;
+	char				*mem[MAX_MEM + 1];
+	char				status;
 	struct termios			old_term;
 };
 

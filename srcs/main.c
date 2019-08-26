@@ -15,18 +15,6 @@
 
 #include <signal.h>
 
-int		g_tes = 1;
-
-void	test(int t)
-{
-	if (t == 2)
-	{
-		write(1, "\n", 1);
-		if (g_tes == 1)
-			write(1, PROMPT, ft_strlen(PROMPT));
-	}
-}
-
 int oputchar(int c)
 {
 	return (write(2, &c, 1));
@@ -99,6 +87,37 @@ int		treat_line(char *line, t_shell *shell)
 	return (1);
 }
 
+t_shell		*get_shell(t_shell *shell)
+{
+	static t_shell *mem;
+
+	if (shell)
+		mem = shell;
+	return (mem);
+}
+
+int	add_to_mem(char *line)
+{
+	t_shell	*shell = get_shell(0);
+	int n;
+	
+	n = -1;
+	while (line[++n] == '\t' || line[n] == ' ')
+		;
+	if (!line[n] || (shell->mem[0] && !ft_strcmp(line, shell->mem[0])))
+		return (1);
+	n = -1;
+	while (shell->mem[++n])
+		;
+	if ((n + 1) == MAX_MEM)
+		free(shell->mem[n--]);
+	while (n-- > 0)
+		shell->mem[n + 1] = shell->mem[n];
+	if (!(shell->mem[0] = ft_strdup(line)))
+		return (1);
+	return (1);
+}
+
 char		*return_line(char *line1, char *line2)
 {
 	char *tmp;	
@@ -110,6 +129,7 @@ char		*return_line(char *line1, char *line2)
 	}
 	write(1, "\n", 1);
 	ft_super_free(2, line1, line2);
+	add_to_mem(tmp);
 	return (tmp);
 }
 
@@ -194,10 +214,60 @@ int go_to_left(char **line1, char **line2)
 	return (1);
 }
 
+
+int 	next_mem(char **line1, char **line2, int *mem)
+{
+	t_shell *shell = get_shell(0);
+	
+	if (shell->mem[*mem + 1])
+	{
+		(*mem)++;
+		free(*line1);
+		if (!(*line1 = ft_strdup(shell->mem[*mem])))
+			return (0);
+		(*line2)[0] = 0;
+		tputs(tgoto(tgetstr("ch", 0), 0, get_strlen("")), 1, oputchar);
+		tputs(tgetstr("ce", 0), 1, oputchar);
+		write(1, *line1, ft_strlen(*line1));
+	}
+	return (1);
+}
+
+int 	prev_mem(char **line1, char **line2, int *mem)
+{	
+	t_shell *shell = get_shell(0);
+
+	if (*mem == 0)
+	{
+		*mem = -1;
+		(*line1)[0] = 0;
+		(*line2)[0] = 0;
+		tputs(tgoto(tgetstr("ch", 0), 0, get_strlen("")), 1, oputchar);
+		tputs(tgetstr("ce", 0), 1, oputchar);
+	}
+	else if (*mem > 0)
+	{
+		(*mem)--;
+		free(*line1);
+		if (!(*line1 = ft_strdup(shell->mem[*mem])))
+		{
+			free(*line2);
+			return (0);
+		}
+		(*line2)[0] = 0;
+		tputs(tgoto(tgetstr("ch", 0), 0, get_strlen("")), 1, oputchar);
+		tputs(tgetstr("ce", 0), 1, oputchar);
+		write(1, *line1, ft_strlen(*line1));
+	}
+	return (1);
+}
+
 char		*get_line(void)
 {
-	char *line1;
-	char *line2;
+	t_shell *shell = get_shell(0);
+	char	*line1;
+	char	*line2;
+	int	mem = -1;
 	long int buf;
 	
 	if (!(line1 = ft_memalloc(1)))
@@ -212,10 +282,16 @@ char		*get_line(void)
 		buf = 0;
 		if (read(0, &buf, 7) <= 0)
 			return (0);
+		if (shell->status)
+		{
+			line1[0] = 0;
+			line2[0] = 0;
+			shell->status = 0;
+		}
 		if (buf == K_UP)
-			;
+			next_mem(&line1, &line2, &mem);
 		else if	(buf == K_DOWN)
-			;
+			prev_mem(&line1, &line2, &mem);
 		else if	(buf == K_RIGHT)
 			go_to_right(&line1, &line2);
 		else if	(buf == K_LEFT)
@@ -229,12 +305,25 @@ char		*get_line(void)
 	}
 }
 
+void	ft_sigint(int sig)
+{
+	t_shell	*shell = get_shell(0);
+	
+	(void)sig;
+	write(1, "\n", 1);
+	if (!shell->status)
+	{
+		write(1, PROMPT, ft_strlen(PROMPT));
+		shell->status = 1;
+	}
+}
+
 int		main(int ac, char **av, char **env)
 {
 	t_shell	*shell;
 	char	*line;
 
-	signal(SIGINT, test);
+	signal(SIGINT, ft_sigint);
 	ac = 0;
 	if (!(shell = ft_memalloc(sizeof(t_shell))))
 		return (-1);
@@ -243,16 +332,17 @@ int		main(int ac, char **av, char **env)
 			free_shell(shell);
 			return (-1);
 	}
+	get_shell(shell);
 	while (1)
 	{
-		g_tes = 1;
 		write(1, PROMPT, ft_strlen(PROMPT));
+		shell->status = 0;
 		if (!(line = get_line()))
 		{
 			free_shell(shell);
 			return (-1);
 		}
-		g_tes = 0;
+		shell->status = 1;
 		if (!treat_line(line, shell))
 		{
 			free_shell(shell);
