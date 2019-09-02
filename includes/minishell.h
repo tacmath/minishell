@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/06/11 11:01:59 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/06/11 12:46:00 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/09/02 17:10:54 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -39,6 +39,7 @@ struct					s_shell
 	char				*mem[MAX_MEM + 1];
 	char				status;
 	struct termios			old_term;
+	struct termios			shell_term;
 };
 
 typedef struct s_shell	t_shell;

@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/06/06 14:10:20 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/06/11 11:25:28 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/09/02 17:16:02 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -19,6 +19,7 @@ int		run_command(char *path, char **av, t_shell *shell)
 	char	*tmp;
 	char	*path_tmp;
 
+	tcsetattr(0, TCSANOW, &shell->old_term);
 	if (path[0] == '.')
 	{
 		path_tmp = getcwd(0, 0);
@@ -33,8 +34,8 @@ int		run_command(char *path, char **av, t_shell *shell)
 	if (father == 0)
 		if (execve(path, av, shell->shell_env) == -1)
 			ft_putendl("command failed");
-	if (father > 0)
-		wait(NULL);
+	wait(NULL);
+	tcsetattr(0, TCSANOW, &shell->shell_term);
 	return (1);
 }
 

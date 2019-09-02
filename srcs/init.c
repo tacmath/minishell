@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/06/06 14:10:39 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/06/11 12:54:18 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/09/02 17:10:37 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -56,6 +56,7 @@ int term_init(t_shell *shell)
 	config.c_lflag &= ~(ECHO | ICANON);
 	config.c_cc[VMIN] = 1;
 	config.c_cc[VTIME] = 0;
+	shell->shell_term  = config;
 	if (tcsetattr(0, TCSANOW, &config) < 0)
 		return (0);
 	if (tgetent(0, getenv("TERM")) < 1)

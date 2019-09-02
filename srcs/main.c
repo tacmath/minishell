@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/06/06 14:10:54 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/06/11 12:52:15 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/09/02 17:02:45 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -311,10 +311,10 @@ void	ft_sigint(int sig)
 	
 	(void)sig;
 	write(1, "\n", 1);
-	if (!shell->status)
+	if (!shell->status || shell->status == 2)
 	{
 		write(1, PROMPT, ft_strlen(PROMPT));
-		shell->status = 1;
+		shell->status = 2;
 	}
 }
 
