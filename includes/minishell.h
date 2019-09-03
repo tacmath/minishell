@@ -53,5 +53,15 @@ int						free_av(char **av);
 int						shell_init(t_shell *shell, char **env, char *name);
 char					**get_av(char *line);
 int						treat_av(char **av, t_shell *shell);
+char                    *get_line(void);
+int                     get_strlen(char *str);
+t_shell        *get_shell(t_shell *shell);
+void    remove_one_char(char *line1, char *line2);
+int go_to_right(char **line1, char **line2);
+int go_to_left(char **line1, char **line2);
+int    add_to_mem(char *line);
+int     next_mem(char **line1, char **line2, int *mem);
+int     prev_mem(char **line1, char **line2, int *mem);
+int oputchar(int c);
 
 #endif
