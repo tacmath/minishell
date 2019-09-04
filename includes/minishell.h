@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/06/11 11:01:59 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/09/02 17:10:54 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/09/04 13:14:17 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -19,6 +19,8 @@
 # include <stdlib.h>
 # include <sys/types.h>
 # include <sys/wait.h>
+# include <sys/ioctl.h>
+# include <dirent.h>
 # include <termios.h>
 # include <termcap.h>
 
@@ -30,6 +32,7 @@
 # define K_LEFT 4479771
 # define K_RETURN 10
 # define K_BACKSPACE 127
+# define K_TAB		'\t'
 
 struct					s_shell
 {
@@ -38,6 +41,8 @@ struct					s_shell
 	char				**shell_env;
 	char				*mem[MAX_MEM + 1];
 	char				status;
+	int					nb_co;
+	int					nb_li;
 	struct termios			old_term;
 	struct termios			shell_term;
 };
@@ -63,5 +68,6 @@ int    add_to_mem(char *line);
 int     next_mem(char **line1, char **line2, int *mem);
 int     prev_mem(char **line1, char **line2, int *mem);
 int oputchar(int c);
+char **get_all_path(char **env);
 
 #endif

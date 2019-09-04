@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/06/06 14:10:54 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/09/02 17:02:45 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/09/04 14:20:52 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -17,44 +17,56 @@
 
 int        treat_line(char *line, t_shell *shell)
 {
-    char    **av;
-    int        n;
-    int        m;
-    
-    n = 0;
-    m = 0;
-    while (line[n++])
-        if (!line[n] || line[n] == ';')
-        {
-            if (line[n] == ';')
-            {
-                line[n] = 0;
-                if (!(av = get_av(&line[m])))
-                    return (0);
-                m = ++n;
-            }
-            else if (!(av = get_av(&line[m])))
-                return (0);
-            if (treat_av(av, shell) && av[0] && av[0][0])
-                if (run_builtins(av, shell))
-                    run_non_builtin(av, shell);
-            free_av(av);
-        }
-    free(line);
-    return (1);
+	char    **av;
+	int        n;
+	int        m;
+
+	n = 0;
+	m = 0;
+	while (line[n++])
+		if (!line[n] || line[n] == ';')
+		{
+			if (line[n] == ';')
+			{
+				line[n] = 0;
+				if (!(av = get_av(&line[m])))
+					return (0);
+				m = ++n;
+			}
+			else if (!(av = get_av(&line[m])))
+				return (0);
+			if (treat_av(av, shell) && av[0] && av[0][0])
+				if (run_builtins(av, shell))
+					run_non_builtin(av, shell);
+			free_av(av);
+		}
+	free(line);
+	return (1);
 }
 
-void	ft_sigint(int sig)
+static void	ft_sigint(int sig)
 {
 	t_shell	*shell = get_shell(0);
-	
+
 	(void)sig;
 	write(1, "\n", 1);
+	tputs(tgetstr("cd", 0), 1, oputchar);
 	if (!shell->status || shell->status == 2)
 	{
 		write(1, PROMPT, ft_strlen(PROMPT));
 		shell->status = 2;
 	}
+}
+
+static void	change_win(int sig)
+{
+	t_shell		*shell = get_shell(0);
+	struct winsize	size;
+
+	(void)sig;
+	ioctl(0, TIOCGWINSZ, &size);
+	shell->nb_co = size.ws_col;
+	shell->nb_li = size.ws_row;
 }
 
 int		main(int ac, char **av, char **env)
@@ -63,15 +75,17 @@ int		main(int ac, char **av, char **env)
 	char	*line;
 
 	signal(SIGINT, ft_sigint);
+	signal(SIGWINCH, change_win);
 	ac = 0;
 	if (!(shell = ft_memalloc(sizeof(t_shell))))
 		return (-1);
 	if (!shell_init(shell, env, av[0]))
 	{
-			free_shell(shell);
-			return (-1);
+		free_shell(shell);
+		return (-1);
 	}
 	get_shell(shell);
+	change_win(0);
 	while (1)
 	{
 		write(1, PROMPT, ft_strlen(PROMPT));
