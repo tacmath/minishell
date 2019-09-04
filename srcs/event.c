@@ -74,8 +74,10 @@ int			get_line_path(char *line, char **path, char *type, int *start)
 	}
 	else if (!(*path = ft_strjoin(getenv("HOME"), &line[n + 1])))              //faire un ft_get_env
 		return (0);
-	if (*start == -1)
-		(*start) = n;
+	if (*start == -1 && n)
+		(*start) = n + 1;
+	else if (*start == -1)
+		(*start) = 0;
 	n = ft_strlen(*path);
 	if (is_command(line))
 		*type = 1;
@@ -246,11 +248,11 @@ int			get_list(char *line1, char ***list, int *start)
 	if (!(name = ft_strdup(&line1[*start])))
 		return (0);
 	remove_last_name(path);
-	if ((!(*start) || line1[*start] == ' ' || line1[*start] == '\t') && type)
+	if ((!(*start) || line1[*start - 1] == ' ' || line1[*start - 1] == '\t') && type)
 		get_all_command(list, name);
 	else if (type)
 		get_all_command_and_dir_from_path(list, path, name);
-	else if ((!(*start) || line1[*start] == ' ' || line1[*start] == '\t'))
+	else if ((!(*start) || line1[*start - 1] == ' ' || line1[*start - 1] == '\t'))
 		get_all_from_path(list, "./", name);
 	else
 		get_all_from_path(list, path, name);
@@ -259,10 +261,9 @@ int			get_list(char *line1, char ***list, int *start)
 	return (1);
 }
 
-int		print_all_choice(char **list)
+int		print_all_choice(char **list, t_shell *shell)
 {
 	int longest_arg;
-	t_shell *shell = get_shell(0);
 	int apl;
 	int line;
 	int n;
@@ -287,7 +288,6 @@ int		print_all_choice(char **list)
 			line++;
 		}
 	}
-	ft_putnbr(line);
 	return (line);
 }
 
@@ -347,11 +347,11 @@ long int	auto_comp_loop(char **list, char **line1, char *line2, int start)
  	}
 }
 
-long int auto_comp(char **line1, char *line2)
+long int auto_comp(char **line1, char *line2, t_shell *shell)
 {
 	char **list;
 	int start;
-	int ret;
+	long int ret;
 
 	start = -1;
 	get_list(*line1, &list, &start);
@@ -365,7 +365,17 @@ long int auto_comp(char **line1, char *line2)
 	tputs(tgoto(tgetstr("ch", 0), 0, 0), 1, oputchar);
 	tputs(tgoto(tgetstr("do", 0), 0, 0), 1, oputchar);
 	tputs(tgetstr("cd", 0), 1, oputchar);
-	tputs(tgoto(tgetstr("UP", 0), 0, print_all_choice(list)), 1, oputchar);
+	ret = print_all_choice(list, shell);
+	if (ret < shell->nb_li)
+		tputs(tgoto(tgetstr("UP", 0), 0, ret), 1, oputchar);
+	else
+	{
+		tputs(tgoto(tgetstr("do", 0), 0, 0), 1, oputchar);
+		tputs(tgoto(tgetstr("ch", 0), 0, 0), 1, oputchar);
+		write(1, PROMPT, ft_strlen(PROMPT));
+		write(1, *line1, ft_strlen(*line1));
+		write(1, line2, ft_strlen(line2));	
+	}
 	tputs(tgoto(tgetstr("ch", 0), 0, get_strlen(*line1)), 1, oputchar);
 	ret = auto_comp_loop(list, line1, line2, start);
 	free_av(list);
@@ -399,7 +409,7 @@ char        *get_line(void)
 			shell->status = 0;
 		}
 		if (buf == K_TAB && is_command(line1) != 2)
-			buf = auto_comp(&line1, line2);
+			buf = auto_comp(&line1, line2, shell);
 		if (buf == K_UP)
 			next_mem(&line1, &line2, &mem);
 		else if    (buf == K_DOWN)
