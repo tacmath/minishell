@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/06/06 14:07:59 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/06/11 13:06:32 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/09/05 14:41:03 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -95,6 +95,9 @@ void	free_shell(t_shell *shell)
 	}
 	free(shell->home);
 	free(shell->last_dir);
+	n = -1;
+	while (shell->mem[++n])
+		free(shell->mem[n]);
 	tcsetattr(0, TCSANOW, &shell->old_term);
 	free(shell);
 }

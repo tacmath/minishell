@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/06/11 11:01:59 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/09/04 13:14:17 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/09/05 16:59:11 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -43,8 +43,8 @@ struct					s_shell
 	char				status;
 	int					nb_co;
 	int					nb_li;
-	struct termios			old_term;
-	struct termios			shell_term;
+	struct termios		old_term;
+	struct termios		shell_term;
 };
 
 typedef struct s_shell	t_shell;
@@ -58,16 +58,30 @@ int						free_av(char **av);
 int						shell_init(t_shell *shell, char **env, char *name);
 char					**get_av(char *line);
 int						treat_av(char **av, t_shell *shell);
-char                    *get_line(void);
-int                     get_strlen(char *str);
-t_shell        *get_shell(t_shell *shell);
-void    remove_one_char(char *line1, char *line2);
-int go_to_right(char **line1, char **line2);
-int go_to_left(char **line1, char **line2);
-int    add_to_mem(char *line);
-int     next_mem(char **line1, char **line2, int *mem);
-int     prev_mem(char **line1, char **line2, int *mem);
-int oputchar(int c);
-char **get_all_path(char **env);
+char					*get_line(void);
+int						get_strlen(char *str);
+t_shell					*get_shell(t_shell *shell);
+void					remove_one_char(char *line1, char *line2);
+int						go_to_right(char **line1, char **line2);
+int						go_to_left(char **line1, char **line2);
+int						add_to_mem(char *line);
+int						next_mem(char **line1, char **line2, int *mem);
+int						prev_mem(char **line1, char **line2, int *mem);
+int						oputchar(int c);
+char					**get_all_path(char **env);
+int						get_all_from_path(char ***list,
+						char *path, char *start);
+int						get_all_command(char ***list, char *command);
+int						get_all_command_and_dir_from_path(char ***list,
+						char *path, char *command);
+int						get_all_command_from_path(char ***list,
+						char *path, char *command);
+int						add_to_list(char ***list, char *new);
+int						get_list(char *line1, char ***list, int *start);
+int						print_all_choice(char **list, t_shell *shell);
+long int				auto_comp(char **line1, char *line2, t_shell *shell);
+char					is_command(char *line);
+int						get_line_path(char *line, char **path,
+						char *type, int *start);
 
 #endif

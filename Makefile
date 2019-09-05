@@ -6,7 +6,7 @@
 #    By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+      #
 #                                                  #+#   #+    #+    #+#       #
 #    Created: 2018/11/05 12:24:50 by mtaquet      #+#   ##    ##    #+#        #
-#    Updated: 2019/09/03 15:05:07 by mtaquet     ###    #+. /#+    ###.fr      #
+#    Updated: 2019/09/05 14:32:03 by mtaquet     ###    #+. /#+    ###.fr      #
 #                                                          /                   #
 #                                                         /                    #
 # **************************************************************************** #
@@ -26,6 +26,11 @@ SRCFILES = main.c\
 		   mem.c\
 		   event.c\
 		   key_event.c\
+		   auto_c.c\
+		   path.c\
+		   list.c\
+		   get_files.c\
+
 
 INCFILES = minishell.h
 LIB = $(addprefix $(LIBDIR),$(LIBFILES))

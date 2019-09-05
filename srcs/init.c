@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/06/06 14:10:39 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/09/02 17:10:37 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/09/05 15:17:57 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -44,11 +44,11 @@ int	env_init(t_shell *shell, char **env)
 	return (1);
 }
 
-int term_init(t_shell *shell)
+int	term_init(t_shell *shell)
 {
 	struct termios config;
 
-	if (!isatty(0))	
+	if (!isatty(0))
 		return (0);
 	if (tcgetattr(0, &shell->old_term) < 0)
 		return (0);
@@ -56,7 +56,7 @@ int term_init(t_shell *shell)
 	config.c_lflag &= ~(ECHO | ICANON);
 	config.c_cc[VMIN] = 1;
 	config.c_cc[VTIME] = 0;
-	shell->shell_term  = config;
+	shell->shell_term = config;
 	if (tcsetattr(0, TCSANOW, &config) < 0)
 		return (0);
 	if (tgetent(0, getenv("TERM")) < 1)
@@ -69,10 +69,9 @@ int	shell_init(t_shell *shell, char **env, char *name)
 	int		n;
 	char	*tmp;
 	char	*path_tmp;
-	
+
 	if (!term_init(shell))
 		return (0);
-	shell->home = 0;
 	n = -1;
 	while (env[++n])
 		if (!ft_strncmp(env[n], "HOME=", 5))
@@ -80,7 +79,6 @@ int	shell_init(t_shell *shell, char **env, char *name)
 				return (0);
 	if (!shell->home && (shell->home = getcwd(0, 0)))
 		return (0);
-	shell->last_dir = 0;
 	env_init(shell, env);
 	if (name[0] == '.')
 	{

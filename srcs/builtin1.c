@@ -6,17 +6,27 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/06/06 14:07:43 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/06/11 11:16:02 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/09/05 15:45:41 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int	cd_check(char **av, t_shell *shell, char *tmp)
+void	cd_last_dir(t_shell *shell, char *tmp)
+{
+	tmp = shell->last_dir;
+	shell->last_dir = getcwd(0, 0);
+	chdir(tmp);
+	change_env(shell->shell_env, "PWD", tmp);
+	change_env(shell->shell_env, "OLDPWD", shell->last_dir);
+	free(tmp);
+}
+
+int		cd_check(char **av, t_shell *shell, char *tmp)
 {
 	if (!av[1])
-	{	
+	{
 		chdir(shell->home);
 		return (1);
 	}
@@ -28,12 +38,7 @@ int	cd_check(char **av, t_shell *shell, char *tmp)
 	}
 	if (!ft_strcmp(av[1], "-") && shell->last_dir)
 	{
-		tmp = shell->last_dir;
-		shell->last_dir = getcwd(0, 0);
-		chdir(tmp);
-		change_env(shell->shell_env, "PWD", tmp);
-		change_env(shell->shell_env, "OLDPWD", shell->last_dir);
-		free(tmp);
+		cd_last_dir(shell, tmp);
 		return (1);
 	}
 	if (access(av[1], F_OK))
@@ -45,7 +50,7 @@ int	cd_check(char **av, t_shell *shell, char *tmp)
 	return (0);
 }
 
-int	ft_cd(char **av, t_shell *shell)
+int		ft_cd(char **av, t_shell *shell)
 {
 	char *tmp;
 
@@ -71,7 +76,7 @@ int	ft_cd(char **av, t_shell *shell)
 	return (1);
 }
 
-int	env_realloc(char **av, t_shell *shell, int n)
+int		env_realloc(char **av, t_shell *shell, int n)
 {
 	char **tmp;
 
@@ -86,7 +91,7 @@ int	env_realloc(char **av, t_shell *shell, int n)
 	return (1);
 }
 
-int	ft_setenv(char **av, t_shell *shell)
+int		ft_setenv(char **av, t_shell *shell)
 {
 	int len;
 	int n;
