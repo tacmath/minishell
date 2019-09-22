@@ -55,7 +55,10 @@ static void	ft_sigint(int sig)
 	if (!shell->status || shell->status == 2)
 	{
 		write(1, PROMPT, ft_strlen(PROMPT));
-		shell->status = 2;
+		if (shell->pre_cursor)
+			shell->pre_cursor[0] = 0;
+		if (shell->after_cursor)
+                     	shell->after_cursor[0] = 0;
 	}
 }
 
@@ -79,7 +82,7 @@ static int	main_loop(t_shell *shell)
 	{
 		write(1, PROMPT, ft_strlen(PROMPT));
 		shell->status = 0;
-		if (!(line = get_line()))
+		if (!(line = get_line(shell)))
 		{
 			free_shell(shell);
 			return (0);

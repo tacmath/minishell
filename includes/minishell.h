@@ -34,12 +34,32 @@
 # define K_BACKSPACE 127
 # define K_TAB		'\t'
 
+struct					s_file
+{
+	char *name;
+	int type;
+};
+
+typedef struct s_file t_file;
+
+struct					s_comp
+{
+	t_file *list;
+	int start;
+};
+
+typedef struct s_comp t_comp;
+
 struct					s_shell
 {
 	char				*home;
 	char				*last_dir;
 	char				**shell_env;
 	char				*mem[MAX_MEM + 1];
+	int				mem_nb;
+	char				*pre_cursor;
+	char				*after_cursor;
+	t_comp				*comp;
 	char				status;
 	int					nb_co;
 	int					nb_li;
@@ -58,28 +78,28 @@ int						free_av(char **av);
 int						shell_init(t_shell *shell, char **env, char *name);
 char					**get_av(char *line);
 int						treat_av(char **av, t_shell *shell);
-char					*get_line(void);
+char					*get_line(t_shell *shell);
 int						get_strlen(char *str);
 t_shell					*get_shell(t_shell *shell);
 void					remove_one_char(char *line1, char *line2);
 int						go_to_right(char **line1, char **line2);
 int						go_to_left(char **line1, char **line2);
 int						add_to_mem(char *line);
-int						next_mem(char **line1, char **line2, int *mem);
-int						prev_mem(char **line1, char **line2, int *mem);
+int						next_mem(t_shell *shell);
+int						prev_mem(t_shell *shell);
 int						oputchar(int c);
 char					**get_all_path(char **env);
-int						get_all_from_path(char ***list,
+int						get_all_from_path(t_file **list,
 						char *path, char *start);
-int						get_all_command(char ***list, char *command);
-int						get_all_command_and_dir_from_path(char ***list,
+int						get_all_command(t_shell *shell, char *command);
+int						get_all_command_and_dir_from_path(t_file **list,
 						char *path, char *command);
-int						get_all_command_from_path(char ***list,
+int						get_all_command_from_path(t_file **list,
 						char *path, char *command);
-int						add_to_list(char ***list, char *new);
-int						get_list(char *line1, char ***list, int *start);
-int						print_all_choice(char **list, t_shell *shell);
-long int				auto_comp(char **line1, char *line2, t_shell *shell);
+int						add_to_list(t_file **list, t_file new);
+int						get_list(t_shell *shell);
+int						print_all_choice(t_shell *shell);
+long int				auto_comp(t_shell *shell);
 char					is_command(char *line);
 int						get_line_path(char *line, char **path,
 						char *type, int *start);

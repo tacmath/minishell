@@ -46,57 +46,42 @@ static char	*add_to_line(char *line1, char *line2, char *new)
 	return (tmp);
 }
 
-int			use_event(char **line1, char **line2, long int buf, int *mem)
+int			use_event(t_shell *shell, long int buf)
 {
 	if (buf == K_UP)
-		next_mem(line1, line2, mem);
+		next_mem(shell);
 	else if (buf == K_DOWN)
-		prev_mem(line1, line2, mem);
+		prev_mem(shell);
 	else if (buf == K_RIGHT)
-		go_to_right(line1, line2);
+		go_to_right(&shell->pre_cursor, &shell->after_cursor);
 	else if (buf == K_LEFT)
-		go_to_left(line1, line2);
+		go_to_left(&shell->pre_cursor, &shell->after_cursor);
 	else if (buf == K_BACKSPACE)
-		remove_one_char(*line1, *line2);
-	else if (!(*line1 = add_to_line(*line1, *line2, (char*)(&buf))))
+		remove_one_char(shell->pre_cursor, shell->after_cursor);
+	else if (!(shell->pre_cursor = add_to_line(shell->pre_cursor, shell->after_cursor, (char*)(&buf))))
 		return (0);
 	return (1);
 }
 
-void		check_status(char *line1, char *line2, t_shell *shell)
+char		*get_line(t_shell *shell)
 {
-	if (shell->status)
-	{
-		line1[0] = 0;
-		line2[0] = 0;
-		shell->status = 0;
-	}
-}
-
-char		*get_line(void)
-{
-	char		*line1;
-	char		*line2;
-	t_shell		*shell;
-	int			mem;
 	long int	buf;
 
-	mem = -1;
-	shell = get_shell(0);
-	if (!(line1 = ft_memalloc(1)) ||
-		!(line2 = ft_memalloc(1)))
+	 
+	shell->mem_nb = -1;
+	if (!(shell->pre_cursor = ft_memalloc(1)) ||
+		!(shell->after_cursor = ft_memalloc(1)))
 		return (0);
 	while (1)
 	{
 		buf = 0;
 		if (read(0, &buf, 7) <= 0)
 			return (0);
-		check_status(line1, line2, shell);
-		if (buf == K_TAB && is_command(line1) != 2)
-			buf = auto_comp(&line1, line2, shell);
+		if (buf == K_TAB && is_command(shell->pre_cursor) != 2)
+			buf = auto_comp(shell);
 		if (buf == K_RETURN)
-			return (return_line(line1, line2));
-		else if (!use_event(&line1, &line2, buf, &mem))
+			return (return_line(shell->pre_cursor, shell->after_cursor));
+		else if (!use_event(shell, buf))
 			return (0);
 	}
 }

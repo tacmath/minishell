@@ -36,49 +36,43 @@ int		add_to_mem(char *line)
 	return (1);
 }
 
-int		next_mem(char **line1, char **line2, int *mem)
+int		next_mem(t_shell *shell)
 {
-	t_shell *shell;
-
-	shell = get_shell(0);
-	if (shell->mem[*mem + 1])
+	if (shell->mem[shell->mem_nb + 1])
 	{
-		(*mem)++;
-		free(*line1);
-		if (!(*line1 = ft_strdup(shell->mem[*mem])))
+		shell->mem_nb++;
+		free(shell->pre_cursor);
+		if (!(shell->pre_cursor = ft_strdup(shell->mem[shell->mem_nb])))
 			return (0);
-		(*line2)[0] = 0;
+		shell->after_cursor[0] = 0;
 		tputs(tgoto(tgetstr("ch", 0), 0, get_strlen("")), 1, oputchar);
 		tputs(tgetstr("ce", 0), 1, oputchar);
-		write(1, *line1, ft_strlen(*line1));
+		write(1, shell->pre_cursor, ft_strlen(shell->pre_cursor));
 	}
 	return (1);
 }
 
-int		prev_mem(char **line1, char **line2, int *mem)
+int		prev_mem(t_shell *shell)
 {
-	t_shell *shell;
-
-	shell = get_shell(0);
-	(*line2)[0] = 0;
-	if (*mem == 0)
+	shell->after_cursor[0] = 0;
+	if (shell->mem_nb == 0)
 	{
-		*mem = -1;
-		(*line1)[0] = 0;
-		(*line2)[0] = 0;
+		shell->mem_nb = -1;
+		shell->pre_cursor[0] = 0;
+		shell->after_cursor[0] = 0;
 		tputs(tgoto(tgetstr("ch", 0), 0, get_strlen("")), 1, oputchar);
 		tputs(tgetstr("ce", 0), 1, oputchar);
 	}
-	else if (*mem > 0)
+	else if (shell->mem_nb > 0)
 	{
-		(*mem)--;
-		free(*line1);
-		if (!(*line1 = ft_strdup(shell->mem[*mem])))
-			return (ft_super_free(1, *line2));
-		(*line2)[0] = 0;
+		shell->mem_nb--;
+		free(shell->pre_cursor);
+		if (!(shell->pre_cursor = ft_strdup(shell->mem[shell->mem_nb])))
+			return (ft_super_free(1, shell->after_cursor));
+		shell->after_cursor[0] = 0;
 		tputs(tgoto(tgetstr("ch", 0), 0, get_strlen("")), 1, oputchar);
 		tputs(tgetstr("ce", 0), 1, oputchar);
-		write(1, *line1, ft_strlen(*line1));
+		write(1, shell->pre_cursor, ft_strlen(shell->pre_cursor));
 	}
 	return (1);
 }
