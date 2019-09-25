@@ -25,6 +25,5 @@ void	*ft_realloc(void *mem, int old_len, int new_len)
 	n = -1;
 	while (++n < old_len && n < new_len)
 		tmp[n] = str[n];
-	free(mem);
 	return (tmp);
 }

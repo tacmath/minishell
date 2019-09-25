@@ -31,19 +31,28 @@ char		is_command(char *line)
 
 static int	complete_path(char **path, char *line, int n, char type)
 {
-	if (line[n] != '~' && line[n + 1] != '/')
+	if (line[n] == ' ' || line[n] == '\t')
+		n++;
+	if (line[n] == '~' && line[n + 1] == '/')
 	{
-		if (type == 1 || (line[n] == '/'
-			|| (line[n] == '.' && line[n + 1] == '/')))
+		if (!(*path = ft_strjoin(getenv("HOME"), &line[n + 1])))
+			return (0);
+	}
+	else
+	{
+		if (type == 1 || line[n] == '/')
 		{
 			if (!(*path = ft_strdup(&line[n])))
 				return (0);
 		}
-		else if (!(*path = ft_strjoin("./", &line[n + 1])))
+		else if (line[n] == '.' && line[n + 1] == '/')
+		{
+			if (!(*path = ft_strdup(&line[n])))
+				return (0);
+		}
+		else if (!(*path = ft_strjoin("./", &line[n])))
 			return (0);
 	}
-	else if (!(*path = ft_strjoin(getenv("HOME"), &line[n + 1])))
-		return (0);
 	return (1);
 }
 

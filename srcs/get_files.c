@@ -18,22 +18,26 @@ int			get_all_command_from_path(t_file **list, char *path, char *command)
 	DIR				*dir;
 	struct dirent	*info;
 	int				command_len;
+	int				path_len;
 	t_file		tmp;
 
 	command_len = ft_strlen(command);
 	if (!(dir = opendir(path)))
 		return (0);
+	path_len = ft_strlen(path);
+	if (!(path = ft_realloc(path, path_len, path_len + NAME_MAX)))
+		return (0);
 	while ((info = readdir(dir)))
-	{
-		if (access(info->d_name, X_OK) &&
-				!ft_strncmp(command, info->d_name, command_len))
+		if (!ft_strncmp(command, info->d_name, command_len)
+			&& ft_strcpy(&path[path_len], info->d_name)
+			&& !access(path, X_OK))
 		{
 			tmp.name = ft_strdup(info->d_name);
 			tmp.type = info->d_type;
 			if (!add_to_list(list, tmp))
 				return (0);
 		}
-	}
+	free(path);
 	closedir(dir);
 	return (1);
 }
@@ -57,16 +61,21 @@ int			get_all_command_and_dir_from_path(t_file **list,
 	DIR				*dir;
 	struct dirent	*info;
 	int				command_len;
+	int path_len;
 	t_file	tmp;
 
 	command_len = ft_strlen(command);
 	if (!(dir = opendir(path)))
 		return (0);
+	path_len = ft_strlen(path);
+	if (!(path = ft_realloc(path, path_len, path_len + NAME_MAX)))
+		return (0);
 	while ((info = readdir(dir)))
 	{
 		if ((command[0] == '.' || info->d_name[0] != '.')
-				&& !ft_strncmp(command, info->d_name, command_len)
-				&& (info->d_type == DT_DIR || access(info->d_name, X_OK)))
+			&& !ft_strncmp(command, info->d_name, command_len)
+			&& (info->d_type == DT_DIR ||
+			(ft_strcpy(&path[path_len], info->d_name) && !access(path, X_OK))))
 		{
 			tmp.name = ft_strdup(info->d_name);
 			tmp.type = info->d_type;
@@ -74,7 +83,7 @@ int			get_all_command_and_dir_from_path(t_file **list,
 				return (0);
 		}
 	}
-
+	free(path);
 	closedir(dir);
 	return (1);
 }

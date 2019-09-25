@@ -49,21 +49,25 @@ int		alloc_path(char *path, char **tmp)
 	i = 0;
 	while (path[++m] != ':' && path[m])
 		;
-	if (!(tmp[i] = ft_memalloc(sizeof(char) * (m + 1))))
+	if (!(tmp[i] = ft_memalloc(sizeof(char) * (m + 2))))
 		return (0);
 	ft_strncpy(tmp[i++], path, m);
-	n = -1;
-	while (path[++n])
-		if (path[n] == ':')
-		{
-			n++;
-			m = 0;
-			while (path[n + ++m] != ':' && path[n + m])
-				;
-			if (!(tmp[i] = ft_memalloc(sizeof(char) * (m + 1))))
-				return (0);
-			ft_strncpy(tmp[i++], &path[n], m);
-		}
+	if (m && path[m - 1] != '/')
+		tmp[i - 1][m] = '/';
+	n = m;
+	while (path[n])
+	{
+		n++;
+		m = 0;
+		while (path[n + ++m] != ':' && path[n + m])
+			;
+		if (!(tmp[i] = ft_memalloc(sizeof(char) * (m + 2))))
+			return (0);
+		ft_strncpy(tmp[i++], &path[n], m);
+		if (m && path[n + m - 1] != '/')
+			tmp[i - 1][m] = '/';
+		n += m;
+	}
 	return (1);
 }
 
@@ -106,7 +110,7 @@ int		run_with_path(char **av, t_shell *shell)
 	n = -1;
 	while (path[++n])
 	{
-		tmp = ft_super_join(3, path[n], "/", av[0]);
+		tmp = ft_strjoin(path[n], av[0]);
 		if (!access(tmp, X_OK | F_OK))
 		{
 			run_command(tmp, av, shell);
