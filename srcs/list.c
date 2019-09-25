@@ -51,6 +51,26 @@ void		remove_last_name(char *str)
 	str[ret] = 0;
 }
 
+int			cmp_list(void *s1, void *s2)
+{
+	t_file *c1;
+	t_file *c2;
+
+	c1 = (t_file*)s1;
+	c2 = (t_file*)s2;
+	return (ft_strcmp(c1->name, c2->name));
+}
+
+void			sort_list(t_file *list)
+{
+	int n;
+
+	n = -1;
+	while (list[++n].name)
+		;
+	ft_quicksort(list, n, sizeof(t_file), cmp_list);
+}
+
 int			get_list(t_shell *shell)
 {
 	char *path;
@@ -60,7 +80,6 @@ int			get_list(t_shell *shell)
 
 	if (!(shell->comp->list = ft_memalloc(sizeof(t_file))))
 		return (0);
-	path = 0;
 	start = -1;
 	get_line_path(shell->pre_cursor, &path, &type, &start);
 	name = &shell->pre_cursor[start];
@@ -75,6 +94,7 @@ int			get_list(t_shell *shell)
 	else
 		get_all_from_path(&shell->comp->list, path, name);
 	shell->comp->start = start;
+	sort_list(shell->comp->list);
 	free(path);
 	return (1);
 }

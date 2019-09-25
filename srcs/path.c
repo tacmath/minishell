@@ -66,12 +66,12 @@ int			get_line_path(char *line, char **path, char *type, int *start)
 		*type = 0;
 		(*start) = n;
 	}
-	while (line[--n] != '\t' && line[n] != ' ' && n)
+	while (--n && line[n] != '\t' && line[n] != ' ')
 		if (line[n] == '/' && (*start) == -1)
 			(*start) = n + 1;
 	if (line[n] == '/' && (*start) == -1)
 		(*start) = n + 1;
-	if (*start == -1 && n)
+	if (*start == -1 && (line[n] == ' ' ||  line[n] == '\t'))
 		(*start) = n + 1;
 	else if (*start == -1)
 		(*start) = 0;

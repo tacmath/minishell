@@ -80,12 +80,12 @@ static void		print_new_prompt(t_shell *shell)
 	write(1, shell->after_cursor, ft_strlen(shell->after_cursor));
 }
 
-void free_comp(t_comp *comp)
+int free_comp(t_comp *comp)
 {
 	int n;
 
 	if (!comp)
-		return ;
+		return (0);
 	if (comp->list)
 	{
 		n = -1;
@@ -94,6 +94,7 @@ void free_comp(t_comp *comp)
 		free(comp->list);
 	}
 	free(comp);
+	return (0);
 }
 
 long int		auto_comp(t_shell *shell)
@@ -106,11 +107,11 @@ long int		auto_comp(t_shell *shell)
 	shell->comp = comp;
 	get_list(shell);
 	if (!comp->list[0].name)
-		return (0);
+		return (free_comp(comp));
 	else if (comp->list[0].name && !comp->list[1].name)
 	{
 		complete_line(shell, 0);
-		return (0);
+		return (free_comp(comp));
 	}
 	tputs(tgoto(tgetstr("ch", 0), 0, 0), 1, oputchar);
 	tputs(tgoto(tgetstr("do", 0), 0, 0), 1, oputchar);

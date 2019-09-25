@@ -28,7 +28,8 @@ int			get_all_command_from_path(t_file **list, char *path, char *command)
 	if (!(path = ft_realloc(path, path_len, path_len + NAME_MAX)))
 		return (0);
 	while ((info = readdir(dir)))
-		if (!ft_strncmp(command, info->d_name, command_len)
+		if (info->d_type == DT_REG
+			&& !ft_strncmp(command, info->d_name, command_len)
 			&& ft_strcpy(&path[path_len], info->d_name)
 			&& !access(path, X_OK))
 		{
@@ -74,8 +75,8 @@ int			get_all_command_and_dir_from_path(t_file **list,
 	{
 		if ((command[0] == '.' || info->d_name[0] != '.')
 			&& !ft_strncmp(command, info->d_name, command_len)
-			&& (info->d_type == DT_DIR ||
-			(ft_strcpy(&path[path_len], info->d_name) && !access(path, X_OK))))
+			&& (info->d_type == DT_DIR || (info->d_type == DT_REG
+			&& ft_strcpy(&path[path_len], info->d_name) && !access(path, X_OK))))
 		{
 			tmp.name = ft_strdup(info->d_name);
 			tmp.type = info->d_type;

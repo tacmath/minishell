@@ -44,7 +44,7 @@ void		ft_quicksort(void *tab, int len,
 	m = 0;
 	n = -1;
 	while (++n < len)
-		if (!cmp(&mem[n * type_size], compa))
+		if (cmp(&mem[n * type_size], compa) <= 0)
 		{
 			if (m != n)
 				swap_mem(&mem[n * type_size], &mem[m * type_size], type_size);
