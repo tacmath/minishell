@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/09/05 15:00:05 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/09/05 16:55:35 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/10/02 13:54:55 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -99,6 +99,16 @@ int			get_list(t_shell *shell)
 	return (1);
 }
 
+void			print_file(t_file file)
+{
+	if (file.type == DT_DIR)
+		ft_putstr("\033[0;34m");
+	else
+		ft_putstr("\033[0;31m");
+	write(1, file.name, ft_strlen(file.name));
+	ft_putstr("\033[m");
+}
+
 int			print_all_choice(t_shell *shell)
 {
 	int longest_arg;
@@ -120,7 +130,7 @@ int			print_all_choice(t_shell *shell)
 	while (list[++n].name)
 	{
 		tputs(tgoto(tgetstr("ch", 0), 0, (n % apl) * longest_arg), 1, oputchar);
-		write(1, list[n].name, ft_strlen(list[n].name));
+		print_file(list[n]);
 		if (n % apl == apl - 1)
 		{
 			tputs(tgoto(tgetstr("do", 0), 0, 0), 1, oputchar);

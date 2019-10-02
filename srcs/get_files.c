@@ -6,12 +6,13 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/09/05 15:01:11 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/09/05 15:21:39 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/10/02 13:41:51 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include "limits.h"
 
 int			get_all_command_from_path(t_file **list, char *path, char *command)
 {
