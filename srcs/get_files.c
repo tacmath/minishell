@@ -6,13 +6,12 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/09/05 15:01:11 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/10/02 13:41:51 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/10/02 14:11:14 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
 
 #include "minishell.h"
-#include "limits.h"
 
 int			get_all_command_from_path(t_file **list, char *path, char *command)
 {
@@ -26,7 +25,7 @@ int			get_all_command_from_path(t_file **list, char *path, char *command)
 	if (!(dir = opendir(path)))
 		return (0);
 	path_len = ft_strlen(path);
-	if (!(path = ft_realloc(path, path_len, path_len + NAME_MAX)))
+	if (!(path = ft_realloc(path, path_len, path_len + sizeof(info->d_name))))
 		return (0);
 	while ((info = readdir(dir)))
 		if (info->d_type == DT_REG
@@ -70,7 +69,7 @@ int			get_all_command_and_dir_from_path(t_file **list,
 	if (!(dir = opendir(path)))
 		return (0);
 	path_len = ft_strlen(path);
-	if (!(path = ft_realloc(path, path_len, path_len + NAME_MAX)))
+	if (!(path = ft_realloc(path, path_len, path_len + sizeof(info->d_name))))
 		return (0);
 	while ((info = readdir(dir)))
 	{
