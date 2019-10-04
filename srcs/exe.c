@@ -111,9 +111,15 @@ int		run_with_path(char **av, t_shell *shell)
 	while (path[++n])
 	{
 		tmp = ft_strjoin(path[n], av[0]);
-		if (!access(tmp, X_OK | F_OK))
+		if (!access(tmp, F_OK))
 		{
-			run_command(tmp, av, shell);
+			if (!access(tmp, X_OK))
+				run_command(tmp, av, shell);
+			else
+			{
+				ft_putstr("minishell: permission denied: ");
+				ft_putendl(av[0]);
+			}
 			free(tmp);
 			break ;
 		}
@@ -130,8 +136,16 @@ int		run_with_path(char **av, t_shell *shell)
 
 int		run_non_builtin(char **av, t_shell *shell)
 {
-	if (!access(av[0], X_OK | F_OK))
-		run_command(av[0], av, shell);
+	if (!access(av[0], F_OK))
+	{
+		if (!access(av[0], X_OK))
+			run_command(av[0], av, shell);
+		else
+		{
+			ft_putstr("minishell: permission denied: ");
+			ft_putendl(av[0]);
+		}
+	}
 	else
 		run_with_path(av, shell);
 	return (1);

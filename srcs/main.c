@@ -21,9 +21,9 @@ int			treat_line(char *line, t_shell *shell)
 	int		n;
 	int		m;
 
-	n = 0;
+	n = -1;
 	m = 0;
-	while (line[n++])
+	while (!(++n) || line[n - 1])
 		if (!line[n] || line[n] == ';')
 		{
 			if (line[n] == ';')
