@@ -16,15 +16,22 @@
 static int		complete_line(t_shell *shell, int comp_nb)
 {
 	char *tmp;
+	int len;
 
 	shell->pre_cursor[shell->comp->start] = 0;
+	len = ft_strlen(shell->pre_cursor);
 	tputs(tgoto(tgetstr("ch", 0), 0, get_strlen(shell->pre_cursor)), 1, oputchar);
 	tputs(tgetstr("ce", 0), 1, oputchar);
-	if (!(tmp = ft_strjoin(shell->pre_cursor, shell->comp->list[comp_nb].name)))
-		return (0);
+	if (shell->comp->list[comp_nb].type != DT_DIR)
+	{
+		if (!(tmp = ft_strjoin(shell->pre_cursor, shell->comp->list[comp_nb].name)))
+			return (0);
+	}
+	else if (!(tmp = ft_super_join(3, shell->pre_cursor, shell->comp->list[comp_nb].name, "/")))
+			return (0);
 	free(shell->pre_cursor);
 	shell->pre_cursor = tmp;
-	write(1, shell->comp->list[comp_nb].name, ft_strlen(shell->comp->list[comp_nb].name));
+	write(1, &tmp[len] , ft_strlen(&tmp[len]));
 	write(1, shell->after_cursor, ft_strlen(shell->after_cursor));
 	tputs(tgoto(tgetstr("ch", 0), 0, get_strlen(shell->pre_cursor)), 1, oputchar);
 	return (1);
@@ -33,8 +40,10 @@ static int		complete_line(t_shell *shell, int comp_nb)
 static void		auto_comp_tab(t_shell *shell, int *num)
 {
 	t_file *list;
+	char	tmp;
 
 	list = shell->comp->list;
+	tmp = 0;
 	if (*num == -1)
 		shell->pre_cursor[shell->comp->start] = 0;
 	if (!list[++(*num)].name)
@@ -42,9 +51,14 @@ static void		auto_comp_tab(t_shell *shell, int *num)
 	tputs(tgoto(tgetstr("ch", 0), 0, get_strlen(shell->pre_cursor)), 1, oputchar);
 	tputs(tgetstr("ce", 0), 1, oputchar);
 	write(1, list[*num].name, ft_strlen(list[*num].name));
+	if (list[*num].type == DT_DIR)
+	{
+		write(1, "/", 1);
+		tmp = 1;
+	}
 	write(1, shell->after_cursor, ft_strlen(shell->after_cursor));
 	tputs(tgoto(tgetstr("ch", 0), 0, get_strlen(shell->pre_cursor)
-		+ ft_strlen(list[*num].name)), 1, oputchar);
+		+ ft_strlen(list[*num].name) + tmp), 1, oputchar);
 }
 
 static long int	auto_comp_loop(t_shell *shell)

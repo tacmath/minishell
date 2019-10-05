@@ -102,11 +102,15 @@ int			get_list(t_shell *shell)
 void			print_file(t_file file)
 {
 	if (file.type == DT_DIR)
-		ft_putstr("\033[0;34m");
-	else
-		ft_putstr("\033[0;31m");
+		ft_putstr("\033[1;34m");
+	else if (file.type == -1)
+		ft_putstr("\033[1;32m");
+	else if (file.type != -2)
+		ft_putstr("\033[1;31m");
 	write(1, file.name, ft_strlen(file.name));
 	ft_putstr("\033[m");
+	if (file.type == DT_DIR)
+		ft_putchar('/');
 }
 
 int			print_all_choice(t_shell *shell)
