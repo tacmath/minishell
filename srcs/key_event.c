@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/09/05 15:06:43 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/10/07 16:53:35 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/10/10 14:19:39 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -24,7 +24,7 @@ void	remove_one_char(t_shell *shell)
 		tmp_len = get_strlen(shell->pre_cursor);
 		shell->pre_cursor[len - 1] = 0;
 		move_cursor(shell, tmp_len, get_strlen(shell->pre_cursor));
-		tputs(tgetstr("ce", 0), 1, oputchar);
+		tputs(tgetstr("cd", 0), 1, oputchar);
 		write(1, shell->after_cursor, ft_strlen(shell->after_cursor));
 		move_cursor(shell, get_strlen(shell->pre_cursor) + get_strlen(shell->after_cursor) - get_strlen(""), get_strlen(shell->pre_cursor));
 	}

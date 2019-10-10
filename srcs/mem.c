@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/09/05 14:57:15 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/09/05 15:06:20 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/10/10 14:17:44 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -41,12 +41,12 @@ int		next_mem(t_shell *shell)
 	if (shell->mem[shell->mem_nb + 1])
 	{
 		shell->mem_nb++;
+		move_cursor(shell, get_strlen(shell->pre_cursor), get_strlen(""));
 		free(shell->pre_cursor);
 		if (!(shell->pre_cursor = ft_strdup(shell->mem[shell->mem_nb])))
 			return (0);
 		shell->after_cursor[0] = 0;
-		tputs(tgoto(tgetstr("ch", 0), 0, get_strlen("")), 1, oputchar);
-		tputs(tgetstr("ce", 0), 1, oputchar);
+		tputs(tgetstr("cd", 0), 1, oputchar);
 		write(1, shell->pre_cursor, ft_strlen(shell->pre_cursor));
 	}
 	return (1);
@@ -55,13 +55,13 @@ int		next_mem(t_shell *shell)
 int		prev_mem(t_shell *shell)
 {
 	shell->after_cursor[0] = 0;
+	move_cursor(shell, get_strlen(shell->pre_cursor), get_strlen(""));
+	tputs(tgetstr("cd", 0), 1, oputchar);
 	if (shell->mem_nb == 0)
 	{
 		shell->mem_nb = -1;
 		shell->pre_cursor[0] = 0;
 		shell->after_cursor[0] = 0;
-		tputs(tgoto(tgetstr("ch", 0), 0, get_strlen("")), 1, oputchar);
-		tputs(tgetstr("ce", 0), 1, oputchar);
 	}
 	else if (shell->mem_nb > 0)
 	{
@@ -70,8 +70,6 @@ int		prev_mem(t_shell *shell)
 		if (!(shell->pre_cursor = ft_strdup(shell->mem[shell->mem_nb])))
 			return (ft_super_free(1, shell->after_cursor));
 		shell->after_cursor[0] = 0;
-		tputs(tgoto(tgetstr("ch", 0), 0, get_strlen("")), 1, oputchar);
-		tputs(tgetstr("ce", 0), 1, oputchar);
 		write(1, shell->pre_cursor, ft_strlen(shell->pre_cursor));
 	}
 	return (1);
