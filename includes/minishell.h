@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/06/11 11:01:59 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/09/05 16:59:11 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/10/07 16:42:37 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -81,9 +81,9 @@ int						treat_av(char **av, t_shell *shell);
 char					*get_line(t_shell *shell);
 int						get_strlen(char *str);
 t_shell					*get_shell(t_shell *shell);
-void					remove_one_char(char *line1, char *line2);
-int						go_to_right(char **line1, char **line2);
-int						go_to_left(char **line1, char **line2);
+void					remove_one_char(t_shell *shell);
+int						go_to_right(t_shell *shell);
+int						go_to_left(t_shell *shell);
 int						add_to_mem(char *line);
 int						next_mem(t_shell *shell);
 int						prev_mem(t_shell *shell);
@@ -103,5 +103,6 @@ long int				auto_comp(t_shell *shell);
 char					is_command(char *line);
 int						get_line_path(char *line, char **path,
 						char *type, int *start);
+void move_cursor(t_shell *shell, int start, int end);
 
 #endif

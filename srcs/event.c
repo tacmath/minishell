@@ -6,12 +6,34 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/09/05 12:02:58 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/09/05 16:42:07 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/10/10 14:02:08 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
 
 #include "minishell.h"
+
+void		move_cursor(t_shell *shell, int start, int end)
+{
+	int line;
+
+	if (start < shell->nb_co && end < shell->nb_co)
+	{
+		tputs(tgoto(tgetstr("ch", 0), 0, end), 1, oputchar);
+		return ;
+	}
+	line = end / shell->nb_co;
+	line -= start / shell->nb_co;
+	if (line > 0)
+		while (line--)
+			tputs(tgoto(tgetstr("do", 0), 0, 0), 1, oputchar);
+	else if (line < 0)
+	{
+		while (line++)
+			tputs(tgoto(tgetstr("up", 0), 0, 0), 1, oputchar);
+	}
+	tputs(tgoto(tgetstr("ch", 0), 0, end % shell->nb_co), 1, oputchar);
+}
 
 static char	*return_line(char *line1, char *line2)
 {
@@ -29,21 +51,35 @@ static char	*return_line(char *line1, char *line2)
 	return (tmp);
 }
 
-static char	*add_to_line(char *line1, char *line2, char *new)
+static int add_to_line(t_shell *shell, char *new)
 {
 	char *tmp;
+	int tmp_len;
 
-	if (!(tmp = ft_super_join(2, line1, new)))
+	tmp_len = get_strlen(shell->pre_cursor);
+	if (!(tmp = ft_super_join(2,shell->pre_cursor , new)))
+		return (ft_super_free(2, shell->pre_cursor, shell->after_cursor));
+	free(shell->pre_cursor);
+	if (!(tmp_len % shell->nb_co))
 	{
-		ft_super_free(2, line1, line2);
-		return (0);
+		tputs(tgoto(tgetstr("up", 0), 0, shell->nb_co), 1, oputchar);
+		tputs(tgoto(tgetstr("ch", 0), 0, shell->nb_co), 1, oputchar);
 	}
-	free(line1);
 	tputs(tgetstr("ce", 0), 1, oputchar);
 	write(1, new, ft_strlen(new));
-	write(1, line2, ft_strlen(line2));
-	tputs(tgoto(tgetstr("ch", 0), 0, get_strlen(tmp)), 1, oputchar);
-	return (tmp);
+	write(1, shell->after_cursor, ft_strlen(shell->after_cursor));
+	tmp_len = get_strlen(tmp);
+	if ((!(tmp_len % shell->nb_co) && !ft_strlen(shell->after_cursor)) || !((tmp_len + get_strlen(shell->after_cursor) - get_strlen("")) % shell->nb_co))
+		tputs(tgoto(tgetstr("do", 0), 0, shell->nb_co), 1, oputchar);
+/*	if (!((tmp_len + get_strlen(shell->after_cursor) - get_strlen("")) % shell->nb_co))
+	{
+		tputs(tgoto(tgetstr("do", 0), 0, shell->nb_co), 1, oputchar);
+	}*/
+		move_cursor(shell, tmp_len + get_strlen(shell->after_cursor) - get_strlen(""), tmp_len);
+//	else 
+//		tputs(tgoto(tgetstr("ch", 0), 0, tmp_len % shell->nb_co), 1, oputchar);
+	shell->pre_cursor = tmp;
+	return (1);
 }
 
 int			use_event(t_shell *shell, long int buf)
@@ -53,12 +89,12 @@ int			use_event(t_shell *shell, long int buf)
 	else if (buf == K_DOWN)
 		prev_mem(shell);
 	else if (buf == K_RIGHT)
-		go_to_right(&shell->pre_cursor, &shell->after_cursor);
+		go_to_right(shell);
 	else if (buf == K_LEFT)
-		go_to_left(&shell->pre_cursor, &shell->after_cursor);
+		go_to_left(shell);
 	else if (buf == K_BACKSPACE)
-		remove_one_char(shell->pre_cursor, shell->after_cursor);
-	else if (!(shell->pre_cursor = add_to_line(shell->pre_cursor, shell->after_cursor, (char*)(&buf))))
+		remove_one_char(shell);
+	else if (!add_to_line(shell, (char*)(&buf)))
 		return (0);
 	return (1);
 }
