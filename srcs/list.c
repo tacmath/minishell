@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/09/05 15:00:05 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/10/02 13:54:55 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/10/11 15:12:27 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -85,7 +85,8 @@ int			get_list(t_shell *shell)
 	name = &shell->pre_cursor[start];
 	remove_last_name(path);
 	if ((!(start) || shell->pre_cursor[start - 1] == ' '
-			|| shell->pre_cursor[start - 1] == '\t') && type)
+			|| shell->pre_cursor[start - 1] == '\t' ||
+			shell->pre_cursor[start - 1] == ';') && type)
 		get_all_command(shell, name);
 	else if (type)
 		get_all_command_and_dir_from_path(&shell->comp->list, path, name);

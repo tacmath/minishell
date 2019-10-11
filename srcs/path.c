@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/09/05 14:55:24 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/09/05 16:56:01 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/10/11 15:11:39 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -16,8 +16,14 @@
 char		is_command(char *line)
 {
 	int n;
+	int m;
 
+	m = -1;
 	n = -1;
+	while (line[++n])
+		if (line[n] == ';')
+			m = n;
+	n = m;
 	while (line[++n] == ' ' || line[n] == '\t')
 		;
 	if (!line[n])
@@ -31,7 +37,7 @@ char		is_command(char *line)
 
 static int	complete_path(char **path, char *line, int n, char type)
 {
-	if (line[n] == ' ' || line[n] == '\t')
+	if (line[n] == ' ' || line[n] == '\t' || line[n] == ';')
 		n++;
 	if (line[n] == '~' && line[n + 1] == '/')
 	{
@@ -66,12 +72,12 @@ int			get_line_path(char *line, char **path, char *type, int *start)
 		*type = 0;
 		(*start) = n;
 	}
-	while (--n && line[n] != '\t' && line[n] != ' ')
+	while (--n && line[n] != '\t' && line[n] != ' ' && line[n] != ';')
 		if (line[n] == '/' && (*start) == -1)
 			(*start) = n + 1;
 	if (line[n] == '/' && (*start) == -1)
 		(*start) = n + 1;
-	if (*start == -1 && (line[n] == ' ' ||  line[n] == '\t'))
+	if (*start == -1 && (line[n] == ' ' ||  line[n] == '\t' || line[n] == ';'))
 		(*start) = n + 1;
 	else if (*start == -1)
 		(*start) = 0;

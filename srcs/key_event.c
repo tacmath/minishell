@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/09/05 15:06:43 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/10/10 14:19:39 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/10/11 14:20:18 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -23,10 +23,10 @@ void	remove_one_char(t_shell *shell)
 	{
 		tmp_len = get_strlen(shell->pre_cursor);
 		shell->pre_cursor[len - 1] = 0;
-		move_cursor(shell, tmp_len, get_strlen(shell->pre_cursor));
+		move_cursor(shell, tmp_len, get_strlen(shell->pre_cursor), 0);
 		tputs(tgetstr("cd", 0), 1, oputchar);
 		write(1, shell->after_cursor, ft_strlen(shell->after_cursor));
-		move_cursor(shell, get_strlen(shell->pre_cursor) + get_strlen(shell->after_cursor) - get_strlen(""), get_strlen(shell->pre_cursor));
+		move_cursor(shell, get_strlen(shell->pre_cursor) + get_strlen(shell->after_cursor) - get_strlen(""), get_strlen(shell->pre_cursor), 1);
 	}
 }
 
@@ -44,7 +44,7 @@ int		go_to_right(t_shell *shell)
 		ft_strcpy(tmp, shell->pre_cursor);
 		tmp[len] = shell->after_cursor[0];
 		tmp[len + 1] = 0;
-		move_cursor(shell, get_strlen(shell->pre_cursor), get_strlen(tmp));
+		move_cursor(shell, get_strlen(shell->pre_cursor), get_strlen(tmp), 0);
 		free(shell->pre_cursor);
 		shell->pre_cursor = tmp;
 		ft_strcpy(shell->after_cursor, &(shell->after_cursor)[1]);
@@ -68,7 +68,7 @@ int		go_to_left(t_shell *shell)
 		tmp[0] = shell->pre_cursor[len1 - 1];
 		len2 = get_strlen(shell->pre_cursor);
 		shell->pre_cursor[len1 - 1] = 0;
-		move_cursor(shell, len2, get_strlen(shell->pre_cursor));
+		move_cursor(shell, len2, get_strlen(shell->pre_cursor), 0);
 		free(shell->after_cursor);
 		shell->after_cursor = tmp;
 	}

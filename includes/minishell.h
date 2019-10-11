@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/06/11 11:01:59 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/10/07 16:42:37 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/10/11 14:15:24 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -103,6 +103,6 @@ long int				auto_comp(t_shell *shell);
 char					is_command(char *line);
 int						get_line_path(char *line, char **path,
 						char *type, int *start);
-void move_cursor(t_shell *shell, int start, int end);
+void move_cursor(t_shell *shell, int start, int end, char mode);
 
 #endif
