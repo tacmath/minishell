@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/09/05 15:00:05 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/10/11 15:12:27 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/11/05 15:34:45 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -136,7 +136,7 @@ int			print_all_choice(t_shell *shell)
 	{
 		tputs(tgoto(tgetstr("ch", 0), 0, (n % apl) * longest_arg), 1, oputchar);
 		print_file(list[n]);
-		if (n % apl == apl - 1)
+		if (n % apl == apl - 1 && list[n + 1].name)
 		{
 			tputs(tgoto(tgetstr("do", 0), 0, 0), 1, oputchar);
 			line++;
