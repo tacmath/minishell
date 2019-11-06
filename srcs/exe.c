@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/06/06 14:10:20 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/09/02 17:16:02 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/11/06 16:04:26 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -39,67 +39,6 @@ int		run_command(char *path, char **av, t_shell *shell)
 	return (1);
 }
 
-int		alloc_path(char *path, char **tmp)
-{
-	int n;
-	int m;
-	int i;
-
-	m = -1;
-	i = 0;
-	while (path[++m] != ':' && path[m])
-		;
-	if (!(tmp[i] = ft_memalloc(sizeof(char) * (m + 2))))
-		return (0);
-	ft_strncpy(tmp[i++], path, m);
-	if (m && path[m - 1] != '/')
-		tmp[i - 1][m] = '/';
-	n = m;
-	while (path[n])
-	{
-		n++;
-		m = 0;
-		while (path[n + ++m] != ':' && path[n + m])
-			;
-		if (!(tmp[i] = ft_memalloc(sizeof(char) * (m + 2))))
-			return (0);
-		ft_strncpy(tmp[i++], &path[n], m);
-		if (m && path[n + m - 1] != '/')
-			tmp[i - 1][m] = '/';
-		n += m;
-	}
-	return (1);
-}
-
-char	**get_all_path(char **env)
-{
-	int		n;
-	int		m;
-	char	**tmp;
-	char	*path;
-
-	n = -1;
-	path = 0;
-	while (env[++n])
-		if (!ft_strncmp("PATH=", env[n], 5))
-			path = &env[n][5];
-	if (!path)
-	{
-		if (!(tmp = ft_memalloc(sizeof(char*))))
-			return (0);
-		return (tmp);
-	}
-	n = -1;
-	m = 2;
-	while (path[++n])
-		if (path[n] == ':')
-			m++;
-	if (!(tmp = ft_memalloc(sizeof(char*) * m)))
-		return (0);
-	alloc_path(path, tmp);
-	return (tmp);
-}
-
 int		run_with_path(char **av, t_shell *shell)
 {
 	char	**path;
@@ -116,20 +55,14 @@ int		run_with_path(char **av, t_shell *shell)
 			if (!access(tmp, X_OK))
 				run_command(tmp, av, shell);
 			else
-			{
-				ft_putstr("minishell: permission denied: ");
-				ft_putendl(av[0]);
-			}
+				print_file_error("minishell: permission denied: ", av[0]);
 			free(tmp);
 			break ;
 		}
 		free(tmp);
 	}
 	if (!path[n])
-	{
-		ft_putstr("minishell: command not found: ");
-		ft_putendl(av[0]);
-	}
+		print_file_error("minishell: command not found: ", av[0]);
 	free_av(path);
 	return (1);
 }
@@ -141,10 +74,7 @@ int		run_non_builtin(char **av, t_shell *shell)
 		if (!access(av[0], X_OK))
 			run_command(av[0], av, shell);
 		else
-		{
-			ft_putstr("minishell: permission denied: ");
-			ft_putendl(av[0]);
-		}
+			print_file_error("minishell: permission denied: ", av[0]);
 	}
 	else
 		run_with_path(av, shell);

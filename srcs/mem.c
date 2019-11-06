@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/09/05 14:57:15 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/10/11 14:19:44 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/11/06 15:41:13 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -48,7 +48,8 @@ int		next_mem(t_shell *shell)
 		shell->after_cursor[0] = 0;
 		tputs(tgetstr("cd", 0), 1, oputchar);
 		write(1, shell->pre_cursor, ft_strlen(shell->pre_cursor));
-		move_cursor(shell, get_strlen(shell->pre_cursor), get_strlen(shell->pre_cursor), 1);
+		move_cursor(shell, get_strlen(shell->pre_cursor),
+			get_strlen(shell->pre_cursor), 1);
 	}
 	return (1);
 }
@@ -72,7 +73,8 @@ int		prev_mem(t_shell *shell)
 			return (ft_super_free(1, shell->after_cursor));
 		shell->after_cursor[0] = 0;
 		write(1, shell->pre_cursor, ft_strlen(shell->pre_cursor));
-		move_cursor(shell, get_strlen(shell->pre_cursor), get_strlen(shell->pre_cursor), 1);
+		move_cursor(shell, get_strlen(shell->pre_cursor),
+			get_strlen(shell->pre_cursor), 1);
 	}
 	return (1);
 }

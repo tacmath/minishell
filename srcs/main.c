@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/06/06 14:10:54 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/11/05 15:07:05 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/11/06 15:31:48 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -58,7 +58,7 @@ static void	ft_sigint(int sig)
 		if (shell->pre_cursor)
 			shell->pre_cursor[0] = 0;
 		if (shell->after_cursor)
-                     	shell->after_cursor[0] = 0;
+			shell->after_cursor[0] = 0;
 	}
 }
 
@@ -71,15 +71,19 @@ static void	change_win(int sig)
 	ioctl(0, TIOCGWINSZ, &size);
 	if (sig && !ft_strlen(shell->after_cursor))
 	{
-		if (!(get_strlen((shell->pre_cursor)) % shell->nb_co) && (get_strlen(shell->pre_cursor) % size.ws_col))
+		if (!(get_strlen((shell->pre_cursor)) % shell->nb_co)
+			&& (get_strlen(shell->pre_cursor) % size.ws_col))
 		{
 			tputs(tgoto(tgetstr("up", 0), 0, 0), 1, oputchar);
-			tputs(tgoto(tgetstr("ch", 0), 0, get_strlen(shell->pre_cursor) % size.ws_col), 1, oputchar);
+			tputs(tgoto(tgetstr("ch", 0), 0, get_strlen(shell->pre_cursor)
+				% size.ws_col), 1, oputchar);
 		}
-		else if ((get_strlen(shell->pre_cursor) % shell->nb_co) && !(get_strlen(shell->pre_cursor) % size.ws_col))
+		else if ((get_strlen(shell->pre_cursor) % shell->nb_co)
+			&& !(get_strlen(shell->pre_cursor) % size.ws_col))
 		{
 			tputs(tgoto(tgetstr("do", 0), 0, 0), 1, oputchar);
-			tputs(tgoto(tgetstr("ch", 0), 0, get_strlen(shell->pre_cursor) % size.ws_col), 1, oputchar);
+			tputs(tgoto(tgetstr("ch", 0), 0, get_strlen(shell->pre_cursor)
+				% size.ws_col), 1, oputchar);
 		}
 	}
 	shell->nb_co = size.ws_col;

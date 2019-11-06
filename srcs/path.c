@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/09/05 14:55:24 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/10/11 15:11:39 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/11/06 15:32:43 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -77,7 +77,7 @@ int			get_line_path(char *line, char **path, char *type, int *start)
 			(*start) = n + 1;
 	if (line[n] == '/' && (*start) == -1)
 		(*start) = n + 1;
-	if (*start == -1 && (line[n] == ' ' ||  line[n] == '\t' || line[n] == ';'))
+	if (*start == -1 && (line[n] == ' ' || line[n] == '\t' || line[n] == ';'))
 		(*start) = n + 1;
 	else if (*start == -1)
 		(*start) = 0;

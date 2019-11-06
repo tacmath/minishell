@@ -6,20 +6,20 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/09/05 15:01:11 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/10/02 14:11:14 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/11/06 16:28:45 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-int			get_all_command_from_path(t_file **list, char *path, char *command)
+int		get_all_command_from_path(t_file **list, char *path, char *command)
 {
 	DIR				*dir;
 	struct dirent	*info;
 	int				command_len;
 	int				path_len;
-	t_file		tmp;
+	t_file			tmp;
 
 	command_len = ft_strlen(command);
 	if (!(dir = opendir(path)))
@@ -38,45 +38,36 @@ int			get_all_command_from_path(t_file **list, char *path, char *command)
 			if (!add_to_list(list, tmp))
 				return (0);
 		}
-	free(path);
 	closedir(dir);
-	return (1);
+	return (!ft_super_free(1, path));
 }
-/*
-   static char	*add_slach_to_name(char *name)
-   {
-   char	*tmp;
-   int		len;
 
-   len = ft_strlen(name);
-   if (!(tmp = ft_memalloc(sizeof(char) + len + 2)))
-   return (0);
-   ft_strcpy(tmp, name);
-   tmp[len] = '/';
-   return (tmp);
-   }*/
+int		check_command(char *command, struct dirent *info, int command_len)
+{
+	if ((command[0] == '.' || info->d_name[0] != '.')
+			&& !ft_strncmp(command, info->d_name, command_len))
+		return (1);
+	return (0);
+}
 
-int			get_all_command_and_dir_from_path(t_file **list,
+int		get_all_command_and_dir_from_path(t_file **list,
 		char *path, char *command)
 {
 	DIR				*dir;
 	struct dirent	*info;
 	int				command_len;
-	int path_len;
-	t_file	tmp;
+	int				path_len;
+	t_file			tmp;
 
 	command_len = ft_strlen(command);
-	if (!(dir = opendir(path)))
-		return (0);
 	path_len = ft_strlen(path);
-	if (!(path = ft_realloc(path, path_len, path_len + sizeof(info->d_name))))
+	if (!(dir = opendir(path)) ||
+		!(path = ft_realloc(path, path_len, path_len + sizeof(info->d_name))))
 		return (0);
 	while ((info = readdir(dir)))
-	{
-		if ((command[0] == '.' || info->d_name[0] != '.')
-			&& !ft_strncmp(command, info->d_name, command_len)
-			&& (info->d_type == DT_DIR || (info->d_type == DT_REG
-			&& ft_strcpy(&path[path_len], info->d_name) && !access(path, X_OK))))
+		if (check_command(command, info, command_len)
+			&& (info->d_type == DT_DIR || (info->d_type == DT_REG &&
+			ft_strcpy(&path[path_len], info->d_name) && !access(path, X_OK))))
 		{
 			tmp.name = ft_strdup(info->d_name);
 			if (info->d_type == DT_DIR)
@@ -86,13 +77,10 @@ int			get_all_command_and_dir_from_path(t_file **list,
 			if (!add_to_list(list, tmp))
 				return (0);
 		}
-	}
-	free(path);
-	closedir(dir);
-	return (1);
+	return (!ft_super_free(1, path) && !closedir(dir));
 }
 
-int			get_all_command(t_shell *shell, char *command)
+int		get_all_command(t_shell *shell, char *command)
 {
 	static char	builtin[7][9] = {"cd", "env",
 		"echo", "setenv", "unsetenv", "exit"};
@@ -109,7 +97,7 @@ int			get_all_command(t_shell *shell, char *command)
 		{
 			tmp.name = ft_strdup(builtin[n]);
 			if (!add_to_list(&shell->comp->list, tmp))
-			return (0);
+				return (0);
 		}
 	if (!(path = get_all_path(shell->shell_env)))
 		return (0);
@@ -121,19 +109,18 @@ int			get_all_command(t_shell *shell, char *command)
 	return (1);
 }
 
-int			get_all_from_path(t_file **list, char *path, char *start)
+int		get_all_from_path(t_file **list, char *path, char *start)
 {
 	DIR				*dir;
 	struct dirent	*info;
 	int				start_len;
 	int				path_len;
-	t_file tmp;
+	t_file			tmp;
 
 	start_len = ft_strlen(start);
-	if (!(dir = opendir(path)))
-		return (0);
 	path_len = ft_strlen(path);
-	if (!(path = ft_realloc(path, path_len, path_len + sizeof(info->d_name))))
+	if (!(dir = opendir(path)) ||
+		!(path = ft_realloc(path, path_len, path_len + sizeof(info->d_name))))
 		return (0);
 	while ((info = readdir(dir)))
 		if ((start[0] == '.' || info->d_name[0] != '.')
@@ -143,11 +130,8 @@ int			get_all_from_path(t_file **list, char *path, char *start)
 			tmp.name = ft_strdup(info->d_name);
 			if (access(path, X_OK) || info->d_type == DT_DIR)
 				tmp.type = info->d_type;
-			else
-				tmp.type = -1;
 			if (!add_to_list(list, tmp))
 				return (0);
 		}
-	closedir(dir);
-	return (1);
+	return (!ft_super_free(1, path) && !closedir(dir));
 }

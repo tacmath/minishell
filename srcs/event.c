@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/09/05 12:02:58 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/11/05 14:34:51 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/11/06 16:37:44 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -15,8 +15,8 @@
 
 void		move_cursor(t_shell *shell, int start, int end, char mode)
 {
-	int line;
-	char m;
+	int		line;
+	char	m;
 
 	m = (mode & 2) >> 1;
 	line = (end - m) / shell->nb_co;
@@ -29,7 +29,8 @@ void		move_cursor(t_shell *shell, int start, int end, char mode)
 		while (line++)
 			tputs(tgoto(tgetstr("up", 0), 0, 0), 1, oputchar);
 	}
-	tputs(tgoto(tgetstr("ch", 0), 0, ((end - m) % shell->nb_co) + m), 1, oputchar);
+	tputs(tgoto(tgetstr("ch", 0), 0,
+		((end - m) % shell->nb_co) + m), 1, oputchar);
 }
 
 static char	*return_line(char *line1, char *line2)
@@ -48,21 +49,24 @@ static char	*return_line(char *line1, char *line2)
 	return (tmp);
 }
 
-static int add_to_line(t_shell *shell, char *new)
+static int	add_to_line(t_shell *shell, char *new)
 {
-	char *tmp;
-	int tmp_len;
+	char	*tmp;
+	int		tmp_len;
 
 	tmp_len = get_strlen(shell->pre_cursor);
-	if (!(tmp = ft_super_join(2,shell->pre_cursor , new)))
+	if (!(tmp = ft_super_join(2, shell->pre_cursor, new)))
 		return (ft_super_free(2, shell->pre_cursor, shell->after_cursor));
 	free(shell->pre_cursor);
 	tputs(tgetstr("cd", 0), 1, oputchar);
-	move_cursor(shell, tmp_len, tmp_len, 2);
+	if (ft_strlen(tmp) != ft_strlen(new) &&
+			tmp[ft_strlen(tmp) - ft_strlen(new) - 1] != '\t')
+		move_cursor(shell, tmp_len, tmp_len, 2);
 	write(1, new, ft_strlen(new));
 	write(1, shell->after_cursor, ft_strlen(shell->after_cursor));
 	tmp_len = get_strlen(tmp);
-	move_cursor(shell, tmp_len + get_strlen(shell->after_cursor) - get_strlen(""), tmp_len, 1);
+	move_cursor(shell, tmp_len + get_strlen(shell->after_cursor)
+		- get_strlen(""), tmp_len, 1);
 	shell->pre_cursor = tmp;
 	return (1);
 }
@@ -88,7 +92,6 @@ char		*get_line(t_shell *shell)
 {
 	long int	buf;
 
-	 
 	shell->mem_nb = -1;
 	if (!(shell->pre_cursor = ft_memalloc(1)) ||
 		!(shell->after_cursor = ft_memalloc(1)))

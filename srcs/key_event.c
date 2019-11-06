@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/09/05 15:06:43 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/11/05 14:38:03 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/11/06 15:42:53 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -28,7 +28,9 @@ void	remove_one_char(t_shell *shell)
 		if (ft_strlen(shell->after_cursor))
 		{
 			write(1, shell->after_cursor, ft_strlen(shell->after_cursor));
-			move_cursor(shell, get_strlen(shell->pre_cursor) + get_strlen(shell->after_cursor) - get_strlen(""), get_strlen(shell->pre_cursor), 1);
+			move_cursor(shell, get_strlen(shell->pre_cursor) +
+				get_strlen(shell->after_cursor) - get_strlen(""),
+					get_strlen(shell->pre_cursor), 1);
 		}
 	}
 }

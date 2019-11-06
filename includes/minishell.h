@@ -6,7 +6,7 @@
 /*   By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+     */
 /*                                                 #+#   #+    #+    #+#      */
 /*   Created: 2019/06/11 11:01:59 by mtaquet      #+#   ##    ##    #+#       */
-/*   Updated: 2019/10/11 14:15:24 by mtaquet     ###    #+. /#+    ###.fr     */
+/*   Updated: 2019/11/06 17:18:22 by mtaquet     ###    #+. /#+    ###.fr     */
 /*                                                         /                  */
 /*                                                        /                   */
 /* ************************************************************************** */
@@ -36,19 +36,19 @@
 
 struct					s_file
 {
-	char *name;
-	int type;
+	char				*name;
+	int					type;
 };
 
-typedef struct s_file t_file;
+typedef struct s_file	t_file;
 
 struct					s_comp
 {
-	t_file *list;
-	int start;
+	t_file				*list;
+	int					start;
 };
 
-typedef struct s_comp t_comp;
+typedef struct s_comp	t_comp;
 
 struct					s_shell
 {
@@ -56,7 +56,7 @@ struct					s_shell
 	char				*last_dir;
 	char				**shell_env;
 	char				*mem[MAX_MEM + 1];
-	int				mem_nb;
+	int					mem_nb;
 	char				*pre_cursor;
 	char				*after_cursor;
 	t_comp				*comp;
@@ -98,11 +98,17 @@ int						get_all_command_from_path(t_file **list,
 						char *path, char *command);
 int						add_to_list(t_file **list, t_file new);
 int						get_list(t_shell *shell);
-int						print_all_choice(t_shell *shell);
 long int				auto_comp(t_shell *shell);
 char					is_command(char *line);
 int						get_line_path(char *line, char **path,
 						char *type, int *start);
-void move_cursor(t_shell *shell, int start, int end, char mode);
+void					move_cursor(t_shell *shell, int start,
+						int end, char mode);
+void					print_choice(t_shell *shell);
+int						free_comp(t_comp *comp);
+void					print_new_prompt(t_shell *shell);
+void					clear_line(t_shell *shell, int start, int end);
+void					remove_last_name(char *str);
+void					print_file_error(char *error, char *file);
 
 #endif

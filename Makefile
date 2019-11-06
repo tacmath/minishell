@@ -6,7 +6,7 @@
 #    By: mtaquet <marvin@le-101.fr>                 +:+   +:    +:    +:+      #
 #                                                  #+#   #+    #+    #+#       #
 #    Created: 2018/11/05 12:24:50 by mtaquet      #+#   ##    ##    #+#        #
-#    Updated: 2019/09/05 14:32:03 by mtaquet     ###    #+. /#+    ###.fr      #
+#    Updated: 2019/11/06 17:05:24 by mtaquet     ###    #+. /#+    ###.fr      #
 #                                                          /                   #
 #                                                         /                    #
 # **************************************************************************** #
@@ -23,6 +23,8 @@ SRCFILES = main.c\
 		   init.c\
 		   command.c\
 		   utils.c\
+		   utils2.c\
+		   utils3.c\
 		   mem.c\
 		   event.c\
 		   key_event.c\
