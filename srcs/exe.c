@@ -31,9 +31,12 @@ int		run_command(char *path, char **av, t_shell *shell)
 	change_env(shell->shell_env, "_", tmp);
 	free(tmp);
 	father = fork();
-	if (father == 0)
-		if (execve(path, av, shell->shell_env) == -1)
+	if (father == 0) {
+		if (execve(path, av, shell->shell_env) == -1) {
 			ft_putendl("command failed");
+			exit(1);
+		}
+	}
 	wait(NULL);
 	tcsetattr(0, TCSANOW, &shell->shell_term);
 	return (1);
